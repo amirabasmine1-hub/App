@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>گروه خانوادگی</title>
+
+<!-- تنظیمات مخصوص نصب روی آیفون (Add to Home Screen) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="گروه خانوادگی">
+<link rel="apple-touch-icon" href="icon.png">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#764ba2">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Tahoma, Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 24px;
+    padding: 40px 30px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: popIn 0.6s ease;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .emoji {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  h1 {
+    color: #6a1b9a;
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+  h2 {
+    color: #764ba2;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #764ba2, transparent);
+    margin: 20px 0;
+    border-radius: 2px;
+  }
+  .members {
+    background: #f5f0fa;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+  .members h3 {
+    color: #4a148c;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+  }
+  .member-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .member-tag {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(118,75,162,0.4);
+  }
+  .owner {
+    color: #d81b60;
+    font-weight: bold;
+    font-size: 1.05rem;
+    margin-top: 15px;
+  }
+  .tagline {
+    margin-top: 20px;
+    font-size: 0.95rem;
+    color: #555;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .robot {
+    font-size: 1.5rem;
+    margin-top: 10px;
+  }
+  .footer-note {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 15px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="emoji">🎉👋</div>
+    <h1>سلام!</h1>
+    <h2>به آپ گروه پسر خاله‌ها و خواهرها خوش آمدید!</h2>
+
+    <div class="divider"></div>
+
+    <div class="members">
+      <h3>👥 اعضای گروه</h3>
+      <div class="member-list">
+        <span class="member-tag">امیر عباس</span>
+        <span class="member-tag">ساشا</span>
+        <span class="member-tag">ساناز</span>
+        <span class="member-tag">پاشا</span>
+        <span class="member-tag">طاها</span>
+        <span class="member-tag">الناز</span>
+      </div>
+    </div>
+
+    <div class="owner">👑 امیر عباس مالک است</div>
+
+    <div class="robot">🤖✨</div>
+    <p class="tagline">
+      ربات‌های فوق پیشرفته و خفن‌ترین گروه خانوادگیمون<br>و ...
+    </p>
+
+    <div class="divider"></div>
+    <p class="footer-note">📱 آپ تستی (هم برای اندروید و ای یو اس)</p>
+  </div>
+</body>
+</html>
