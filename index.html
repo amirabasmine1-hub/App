@@ -41,6 +41,65 @@
     text-align: center;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     animation: popIn 0.6s ease;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  /* دکمه تغییر تم */
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background 0.4s ease;
+  }
+  .theme-toggle:active { transform: scale(0.85) rotate(20deg); }
+
+  /* حالت شب */
+  body.dark-mode {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  }
+  body.dark-mode .card {
+    background: rgba(30,27,55,0.97);
+    color: #e5e7eb;
+  }
+  body.dark-mode h1 { color: #c4b5fd; }
+  body.dark-mode h2 { color: #a78bfa; }
+  body.dark-mode .members,
+  body.dark-mode .prices,
+  body.dark-mode .poll-box,
+  body.dark-mode .news-box,
+  body.dark-mode .birthday-box,
+  body.dark-mode .visits-box {
+    background: rgba(255,255,255,0.06);
+  }
+  body.dark-mode .members h3 { color: #ddd6fe; }
+  body.dark-mode .news-item {
+    background: rgba(255,255,255,0.08);
+    color: #d1fae5;
+  }
+  body.dark-mode .poll-btn {
+    background: rgba(255,255,255,0.06);
+    color: #dbeafe;
+  }
+  body.dark-mode .tagline,
+  body.dark-mode .footer-note,
+  body.dark-mode .price-note,
+  body.dark-mode .poll-count {
+    color: #9ca3af;
+  }
+  body.dark-mode .theme-toggle {
+    background: rgba(255,255,255,0.15);
   }
   @keyframes popIn {
     0% { transform: scale(0.8); opacity: 0; }
@@ -423,9 +482,48 @@
     font-size: 0.85rem;
     padding: 10px;
   }
+
+  .visits-box {
+    background: #fef9c3;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 20px 0;
+  }
+  .visits-box h3 {
+    color: #854d0e;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+  }
+  .visit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  .visit-row.me {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    font-weight: bold;
+  }
+  .visit-count-num {
+    background: #78350f;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+  }
+  .visit-row.me .visit-count-num {
+    background: rgba(255,255,255,0.3);
+  }
 </style>
 </head>
 <body>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙</button>
+
   <!-- صفحه لودینگ -->
   <div id="loading-screen">
     <div class="loading-glow"></div>
@@ -498,6 +596,13 @@
       <div class="news-list" id="news-list">
         <div class="news-loading">در حال دریافت اخبار...</div>
       </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="visits-box">
+      <h3>📊 کی بیشتر اپ رو باز کرده؟</h3>
+      <div id="visits-list"></div>
     </div>
 
     <div class="robot">🤖✨</div>
@@ -712,6 +817,92 @@
       const activeTab = document.querySelector('.news-tab.active');
       loadNews(activeTab.dataset.feed);
     }, 120000); // هر ۲ دقیقه بروزرسانی میشه
+
+    // ---------- تم شب/روز ----------
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('khanevadeh_theme', isDark ? 'dark' : 'light');
+      playClickSound();
+    }
+    if (localStorage.getItem('khanevadeh_theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('theme-toggle').textContent = '☀️';
+    }
+
+    // ---------- صدای کلیک روی دکمه‌ها ----------
+    let audioCtx;
+    function playClickSound() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(720, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(340, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch (e) { /* مرورگر پشتیبانی نمی‌کنه */ }
+    }
+    document.querySelectorAll('button, .poll-btn, .news-tab, a.news-item, a.price-tag')
+      .forEach(el => el.addEventListener('click', playClickSound));
+
+    // ---------- شمارنده بازدید هر عضو ----------
+    const familyMembers = ["امیر عباس", "ساشا", "ساناز", "پاشا", "طاها", "الناز"];
+    const ME_KEY = "khanevadeh_my_name";
+
+    function askMyName() {
+      let name = localStorage.getItem(ME_KEY);
+      if (!name) {
+        const list = familyMembers.map((n, i) => (i + 1) + ". " + n).join("\n");
+        let answer = prompt("اسمت چیه؟ عدد مربوطه رو بنویس:\n" + list);
+        const idx = parseInt(answer) - 1;
+        name = familyMembers[idx] || null;
+        if (name) localStorage.setItem(ME_KEY, name);
+      }
+      return name;
+    }
+
+    async function trackVisit() {
+      const myName = askMyName();
+      if (!myName) return renderVisits({});
+
+      try {
+        const res = await fetch(FIREBASE_URL + "/visits.json");
+        const data = await res.json() || {};
+        data[myName] = (data[myName] || 0) + 1;
+        await fetch(FIREBASE_URL + "/visits.json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        renderVisits(data);
+      } catch (e) {
+        console.error("خطا در ثبت بازدید", e);
+      }
+    }
+
+    function renderVisits(data) {
+      const myName = localStorage.getItem(ME_KEY);
+      const sorted = familyMembers
+        .map(name => ({ name, count: data[name] || 0 }))
+        .sort((a, b) => b.count - a.count);
+
+      const container = document.getElementById('visits-list');
+      container.innerHTML = '';
+      sorted.forEach(person => {
+        const row = document.createElement('div');
+        row.className = 'visit-row' + (person.name === myName ? ' me' : '');
+        row.innerHTML = `<span>${person.name}</span><span class="visit-count-num">${person.count} بار</span>`;
+        container.appendChild(row);
+      });
+    }
+
+    trackVisit();
   </script>
 </body>
 </html>
