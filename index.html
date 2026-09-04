@@ -140,10 +140,16 @@
     color: white;
     padding: 10px 8px;
     border-radius: 12px;
-    font-size: 0.95rem;
-    text-decoration: none;
+    font-size: 0.9rem;
     box-shadow: 0 2px 8px rgba(217,119,6,0.4);
     display: block;
+    line-height: 1.6;
+  }
+  .price-value {
+    font-size: 0.95rem;
+    font-weight: bold;
+    direction: ltr;
+    display: inline-block;
   }
   .price-note {
     font-size: 0.75rem;
@@ -220,6 +226,80 @@
     100% { transform: translateY(-110vh) translateX(20px) rotate(360deg); opacity: 0; }
   }
   .card { position: relative; z-index: 1; }
+
+  .birthday-box {
+    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+    border-radius: 16px;
+    padding: 18px;
+    margin: 20px 0;
+    display: none;
+  }
+  .birthday-box.show { display: block; animation: popIn 0.6s ease; }
+  .birthday-box h3 {
+    color: #ad1457;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .birthday-box .bname {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #880e4f;
+  }
+
+  .poll-box {
+    background: #eef4ff;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 20px 0;
+    text-align: right;
+  }
+  .poll-box h3 {
+    color: #1e40af;
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .poll-option {
+    margin-bottom: 10px;
+  }
+  .poll-btn {
+    width: 100%;
+    background: white;
+    border: 2px solid #93c5fd;
+    color: #1e3a8a;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .poll-btn:hover { background: #dbeafe; }
+  .poll-btn.voted {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+    border-color: #1e40af;
+  }
+  .poll-bar-wrap {
+    background: #e5e7eb;
+    border-radius: 8px;
+    height: 6px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .poll-bar {
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+    height: 100%;
+    transition: width 0.4s ease;
+  }
+  .poll-count {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 3px;
+  }
 </style>
 </head>
 <body>
@@ -248,6 +328,11 @@
       </div>
     </div>
 
+    <div class="birthday-box" id="birthday-box">
+      <h3>🎂 امروز تولد کیه؟</h3>
+      <div class="bname" id="birthday-name"></div>
+    </div>
+
     <div class="owner">👑 امیر عباس مالک است</div>
 
     <div class="divider"></div>
@@ -255,12 +340,20 @@
     <div class="prices">
       <h3>💰 قیمت لحظه‌ای ارز و کریپتو</h3>
       <div class="price-grid">
-        <a href="https://www.tgju.org/profile/price_dollar_rl" target="_blank" class="price-tag">💵 دلار</a>
-        <a href="https://www.tgju.org/profile/crypto-tether" target="_blank" class="price-tag">🪙 تتر</a>
-        <a href="https://www.tgju.org/profile/price_eur" target="_blank" class="price-tag">💶 یورو</a>
-        <a href="https://www.tgju.org/profile/crypto-bitcoin" target="_blank" class="price-tag">₿ بیت‌کوین</a>
+        <div class="price-tag" id="price-usd">💵 دلار<br><span class="price-value">در حال دریافت...</span></div>
+        <div class="price-tag" id="price-usdt">🪙 تتر<br><span class="price-value">در حال دریافت...</span></div>
+        <div class="price-tag" id="price-eur">💶 یورو<br><span class="price-value">در حال دریافت...</span></div>
+        <div class="price-tag" id="price-btc">₿ بیت‌کوین<br><span class="price-value">در حال دریافت...</span></div>
       </div>
-      <p class="price-note">با لمس هر کدوم، قیمت لحظه‌ای و زنده‌ش باز میشه</p>
+      <p class="price-note" id="price-updated">در حال بروزرسانی...</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="poll-box">
+      <h3>🗳️ بهترین آشپز خانواده کیه؟</h3>
+      <div id="poll-options"></div>
+      <p class="poll-count" id="poll-total" style="text-align:center; margin-top:10px;"></p>
     </div>
 
     <div class="robot">🤖✨</div>
@@ -296,6 +389,160 @@
       }
     }
     createParticles();
+
+    // بررسی تولد امروز (تقویم شمسی)
+    const birthdays = [
+      { name: "امیر عباس", month: 8, day: 2 },   // ۲ آبان
+      { name: "ساشا",      month: 10, day: 14 }, // ۱۴ دی
+      { name: "ساناز",     month: 7, day: 25 },  // ۲۵ مهر
+      { name: "پاشا",      month: 6, day: 1 },   // ۱ شهریور
+      { name: "طاها",      month: 2, day: 15 },  // ۱۵ اردیبهشت
+      { name: "الناز",     month: 12, day: 6 }   // ۶ اسفند
+    ];
+
+    function getJalaliMonthDay() {
+      const formatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { month: 'numeric', day: 'numeric' });
+      const parts = formatter.formatToParts(new Date());
+      let month, day;
+      parts.forEach(p => {
+        if (p.type === 'month') month = parseInt(p.value);
+        if (p.type === 'day') day = parseInt(p.value);
+      });
+      return { month, day };
+    }
+
+    function checkBirthdays() {
+      const today = getJalaliMonthDay();
+      const todaysPeople = birthdays.filter(b => b.month === today.month && b.day === today.day);
+      if (todaysPeople.length > 0) {
+        document.getElementById('birthday-name').textContent =
+          todaysPeople.map(p => p.name).join('، ') + ' 🎉🎂';
+        document.getElementById('birthday-box').classList.add('show');
+      }
+    }
+    checkBirthdays();
+
+    // ---------- رای‌گیری واقعی با Firebase Realtime Database ----------
+    const FIREBASE_URL = "https://app-khanevadeh-bc38f-default-rtdb.firebaseio.com";
+    const pollOptions = ["امیر عباس", "ساشا", "ساناز", "پاشا", "طاها", "الناز"];
+    const VOTED_KEY = "khanevadeh_voted_option";
+
+    async function loadPoll() {
+      try {
+        const res = await fetch(FIREBASE_URL + "/poll/votes.json");
+        const data = await res.json() || {};
+        renderPoll(data);
+      } catch (e) {
+        console.error("خطا در دریافت رای‌ها", e);
+      }
+    }
+
+    function renderPoll(votes) {
+      const container = document.getElementById("poll-options");
+      container.innerHTML = "";
+      const total = pollOptions.reduce((sum, opt) => sum + (votes[opt] || 0), 0);
+      const myVote = localStorage.getItem(VOTED_KEY);
+
+      pollOptions.forEach(opt => {
+        const count = votes[opt] || 0;
+        const percent = total > 0 ? Math.round((count / total) * 100) : 0;
+        const wrapper = document.createElement("div");
+        wrapper.className = "poll-option";
+
+        const btn = document.createElement("button");
+        btn.className = "poll-btn" + (myVote === opt ? " voted" : "");
+        btn.innerHTML = `<span>${opt}</span><span>${percent}%</span>`;
+        btn.onclick = () => vote(opt);
+
+        const barWrap = document.createElement("div");
+        barWrap.className = "poll-bar-wrap";
+        const bar = document.createElement("div");
+        bar.className = "poll-bar";
+        bar.style.width = percent + "%";
+        barWrap.appendChild(bar);
+
+        const countText = document.createElement("div");
+        countText.className = "poll-count";
+        countText.textContent = count + " رای";
+
+        wrapper.appendChild(btn);
+        wrapper.appendChild(barWrap);
+        wrapper.appendChild(countText);
+        container.appendChild(wrapper);
+      });
+
+      document.getElementById("poll-total").textContent = "مجموع آرا: " + total;
+    }
+
+    async function vote(option) {
+      const prevVote = localStorage.getItem(VOTED_KEY);
+      if (prevVote === option) return; // قبلا به همین گزینه رای داده
+
+      try {
+        const res = await fetch(FIREBASE_URL + "/poll/votes.json");
+        const data = await res.json() || {};
+
+        // اگه قبلا به گزینه دیگه رای داده بود، اون رو کم کن
+        if (prevVote && data[prevVote]) {
+          data[prevVote] = Math.max(0, data[prevVote] - 1);
+        }
+        data[option] = (data[option] || 0) + 1;
+
+        await fetch(FIREBASE_URL + "/poll/votes.json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        localStorage.setItem(VOTED_KEY, option);
+        renderPoll(data);
+      } catch (e) {
+        console.error("خطا در ثبت رای", e);
+      }
+    }
+
+    loadPoll();
+
+    // ---------- قیمت لحظه‌ای ارز و کریپتو ----------
+    function formatToman(num) {
+      return Math.round(num).toLocaleString('en-US') + ' تومان';
+    }
+    function formatUsd(num) {
+      return '$' + num.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    }
+
+    async function loadPrices() {
+      // دلار و یورو (تومان) از Sarrafchi
+      try {
+        const res = await fetch('https://api.sarrafchi.ir/rate/');
+        const data = await res.json();
+        const usdToman = data.currencies["US Dollar"].sell;
+        const eurToman = data.currencies["Euro"].sell;
+        document.querySelector('#price-usd .price-value').textContent = usdToman + ' تومان';
+        document.querySelector('#price-eur .price-value').textContent = eurToman + ' تومان';
+      } catch (e) {
+        document.querySelector('#price-usd .price-value').textContent = 'خطا در دریافت';
+        document.querySelector('#price-eur .price-value').textContent = 'خطا در دریافت';
+      }
+
+      // تتر و بیت‌کوین (دلار) از CoinGecko
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,tether&vs_currencies=usd');
+        const data = await res.json();
+        document.querySelector('#price-btc .price-value').textContent = formatUsd(data.bitcoin.usd);
+        document.querySelector('#price-usdt .price-value').textContent = formatUsd(data.tether.usd);
+      } catch (e) {
+        document.querySelector('#price-btc .price-value').textContent = 'خطا در دریافت';
+        document.querySelector('#price-usdt .price-value').textContent = 'خطا در دریافت';
+      }
+
+      const now = new Date();
+      document.getElementById('price-updated').textContent =
+        'آخرین بروزرسانی: ' + now.toLocaleTimeString('fa-IR');
+    }
+
+    loadPrices();
+    setInterval(loadPrices, 60000); // هر ۱ دقیقه بروزرسانی میشه
   </script>
 </body>
 </html>
