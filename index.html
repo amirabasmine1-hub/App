@@ -14,6 +14,10 @@
 <!-- PWA Manifest -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#764ba2">
+
+<!-- Firebase SDK برای نوتیفیکیشن پوش واقعی -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -662,7 +666,7 @@
     <div class="divider"></div>
 
     <div class="notif-permission-box" id="notif-permission-box">
-      <p>🔔 برای دریافت نوتیفیکیشن واقعی (مثل تلگرام و واتساپ) اجازه بده</p>
+      <p>🔔 برای دریافت پیام حتی وقتی اپ بسته‌ست، اجازه بده</p>
       <button class="notif-btn" onclick="requestNotifPermission()">فعال کردن نوتیفیکیشن</button>
     </div>
 
@@ -965,14 +969,21 @@
 
     trackVisit();
 
-    // ---------- نوتیفیکیشن واقعی سیستمی (Service Worker + Notification API) ----------
-    let swRegistration = null;
+    // ---------- نوتیفیکیشن پوش واقعی با Firebase Cloud Messaging ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqN16oDe7vut3Smp4L48y8yfSt3dHcSUQ",
+      authDomain: "app-khanevadeh-bc38f.firebaseapp.com",
+      databaseURL: "https://app-khanevadeh-bc38f-default-rtdb.firebaseio.com",
+      projectId: "app-khanevadeh-bc38f",
+      storageBucket: "app-khanevadeh-bc38f.firebasestorage.app",
+      messagingSenderId: "646966036280",
+      appId: "1:646966036280:web:8f10776ac2d5b3971a63cd"
+    };
+    const VAPID_KEY = "BB3n35-UrOlxWMFTkbWZXJG4oQzDpH6q8WmSnpT-aJ7ApC9hLtaG6lonETXF6ZMJ-Kfk2VNDnrY2HDiSOAn6Eec";
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => { swRegistration = reg; })
-        .catch(err => console.error('ثبت سرویس‌ورکر ناموفق بود', err));
-    }
+    firebase.initializeApp(firebaseConfig);
+    let messaging = null;
+    try { messaging = firebase.messaging(); } catch (e) { console.error("FCM پشتیبانی نمیشه", e); }
 
     function updateNotifBoxVisibility() {
       const box = document.getElementById('notif-permission-box');
@@ -986,80 +997,66 @@
 
     async function requestNotifPermission() {
       playClickSound();
-      if (!('Notification' in window)) {
+      if (!('Notification' in window) || !messaging) {
         alert('مرورگرت از نوتیفیکیشن پشتیبانی نمی‌کنه.');
         return;
       }
-      const permission = await Notification.requestPermission();
-      updateNotifBoxVisibility();
-      if (permission === 'granted') {
-        sendSystemNotification('گروه خانوادگی', 'نوتیفیکیشن با موفقیت فعال شد ✅');
+      try {
+        const permission = await Notification.requestPermission();
+        updateNotifBoxVisibility();
+        if (permission === 'granted') {
+          const swReg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+          const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+          if (token) {
+            const myName = localStorage.getItem(ME_KEY) || ("user_" + Date.now());
+            await fetch(FIREBASE_URL + "/fcmTokens/" + encodeURIComponent(myName) + ".json", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(token)
+            });
+          }
+        }
+      } catch (e) {
+        console.error("خطا در فعال‌سازی نوتیف", e);
+        alert('فعال‌سازی نوتیف با خطا مواجه شد.');
       }
     }
 
-    function sendSystemNotification(title, body) {
-      if (!('Notification' in window) || Notification.permission !== 'granted') return;
-
-      if (swRegistration) {
-        // از طریق سرویس‌ورکر (پایدارتر، مخصوصا برای اندروید/iOS نصب‌شده)
-        navigator.serviceWorker.ready.then(reg => {
-          reg.active.postMessage({ type: 'SHOW_NOTIFICATION', title, body });
-        });
-      } else {
-        new Notification(title, { body, icon: 'icon.png' });
-      }
+    // نمایش نوتیف وقتی اپ باز است (foreground)
+    if (messaging) {
+      messaging.onMessage((payload) => {
+        const title = (payload.notification && payload.notification.title) || 'گروه خانوادگی';
+        const body = (payload.notification && payload.notification.body) || '';
+        if (Notification.permission === 'granted') {
+          navigator.serviceWorker.getRegistration('firebase-messaging-sw.js').then(reg => {
+            if (reg) reg.showNotification(title, { body, icon: 'icon.png' });
+            else new Notification(title, { body, icon: 'icon.png' });
+          });
+        }
+      });
     }
 
     updateNotifBoxVisibility();
 
-    const funnyNotifs = [
-      { title: "گروه خانوادگی 👑", body: "این برنامه توسط امیر عباس ساخته شده است. by amirabas" },
-      { title: "هشدار خانوادگی ⚠️", body: "این اپ ممکنه اعتیادآور باشه!" },
-      { title: "😏", body: "امیر عباس همین الان داره به تو فکر می‌کنه" },
-      { title: "یادآوری 💬", body: "یادت نره امروز به یکی از اعضا پیام بدی" },
-      { title: "🎉", body: "این اپ ۱۰۰٪ خانوادگی و ۱۰۰٪ باحاله" },
-      { title: "🤖", body: "ربات‌های خفن گروه همیشه بیدارن" }
-    ];
-
-    // موقع باز شدن اپ، اول پیام «ساخته شده توسط امیرعباس» و بعد یه پیام تصادفی
-    setTimeout(() => {
-      sendSystemNotification(funnyNotifs[0].title, funnyNotifs[0].body);
-    }, 2000);
-
-    setTimeout(() => {
-      const rest = funnyNotifs.slice(1);
-      const pick = rest[Math.floor(Math.random() * rest.length)];
-      sendSystemNotification(pick.title, pick.body);
-    }, 8000);
-
-    // ---------- هشدار تغییر قیمت بیت‌کوین ----------
-    const BTC_PREV_KEY = "khanevadeh_btc_prev_price";
-
-    async function checkBtcPriceChange() {
+    // اگه قبلاً مجوز داده شده، خودکار توکن جدید رو بگیر و ذخیره کن
+    async function syncTokenIfAlreadyGranted() {
+      if (!messaging || !('Notification' in window) || Notification.permission !== 'granted') return;
       try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-        const data = await res.json();
-        const currentPrice = data.bitcoin.usd;
-        const prevPrice = parseFloat(localStorage.getItem(BTC_PREV_KEY));
-
-        if (prevPrice) {
-          const changePercent = ((currentPrice - prevPrice) / prevPrice) * 100;
-          if (Math.abs(changePercent) >= 1) {
-            const direction = changePercent > 0 ? "📈 افزایش" : "📉 کاهش";
-            sendSystemNotification(
-              "قیمت بیت‌کوین " + direction,
-              changePercent.toFixed(1) + "٪ تغییر — اکنون $" + currentPrice.toLocaleString('en-US')
-            );
-          }
+        const swReg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+        const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+        if (token) {
+          const myName = localStorage.getItem(ME_KEY) || ("user_" + Date.now());
+          await fetch(FIREBASE_URL + "/fcmTokens/" + encodeURIComponent(myName) + ".json", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(token)
+          });
         }
-        localStorage.setItem(BTC_PREV_KEY, currentPrice);
       } catch (e) {
-        console.error("خطا در چک قیمت بیت‌کوین", e);
+        console.error("خطا در همگام‌سازی توکن", e);
       }
     }
-
-    setTimeout(checkBtcPriceChange, 3500);
-    setInterval(checkBtcPriceChange, 90000); // هر ۹۰ ثانیه چک میشه
+    syncTokenIfAlreadyGranted();
   </script>
 </body>
 </html>
