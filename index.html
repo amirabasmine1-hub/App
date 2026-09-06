@@ -715,6 +715,53 @@
   .voice-item audio { max-width: 150px; height: 32px; }
 
   /* نشان‌های خانواده */
+  /* رادار زنده خانواده */
+  .radar-box {
+    background: #f0fdf4;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 20px 0;
+  }
+  .radar-box h3 {
+    color: #15803d;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+  }
+  .radar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 9px 14px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+  }
+  .radar-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1d5db;
+    flex-shrink: 0;
+  }
+  .status-dot.online {
+    background: #22c55e;
+    box-shadow: 0 0 0 rgba(34,197,94,0.6);
+    animation: onlinePulse 1.6s infinite;
+  }
+  @keyframes onlinePulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  }
+  .radar-name { font-size: 0.92rem; color: #166534; font-weight: bold; }
+  .radar-status { font-size: 0.78rem; color: #6b7280; }
+  .radar-status.online-text { color: #16a34a; font-weight: bold; }
+
   .badges-box {
     background: linear-gradient(135deg, #1e1b4b, #312e81);
     border-radius: 16px;
@@ -1121,6 +1168,13 @@
 
     <div class="divider"></div>
 
+    <div class="radar-box">
+      <h3>🟢 رادار خانواده</h3>
+      <div id="radar-list"></div>
+    </div>
+
+    <div class="divider"></div>
+
     <div class="badges-box">
       <h3>🏅 نشان‌های خانواده</h3>
       <div class="badge-list" id="badge-list"></div>
@@ -1494,6 +1548,66 @@
     }
 
     trackVisit();
+
+    // ---------- رادار زنده خانواده (Presence) ----------
+    function relativeTimeFa(diffMs) {
+      const sec = Math.floor(diffMs / 1000);
+      if (sec < 60) return "چند ثانیه پیش";
+      const min = Math.floor(sec / 60);
+      if (min < 60) return min + " دقیقه پیش";
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return hr + " ساعت پیش";
+      const day = Math.floor(hr / 24);
+      return day + " روز پیش";
+    }
+
+    async function sendPresence() {
+      const myName = localStorage.getItem(ME_KEY);
+      if (!myName) return;
+      try {
+        await fetch(FIREBASE_URL + "/presence/" + encodeURIComponent(myName) + ".json", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(Date.now())
+        });
+      } catch (e) {
+        console.error("خطا در ارسال حضور", e);
+      }
+    }
+
+    async function loadPresence() {
+      try {
+        const res = await fetch(FIREBASE_URL + "/presence.json");
+        const data = await res.json() || {};
+        const now = Date.now();
+        const container = document.getElementById('radar-list');
+        container.innerHTML = '';
+
+        familyMembers.forEach(name => {
+          const lastSeen = data[name];
+          const isOnline = lastSeen && (now - lastSeen < 20000);
+          const row = document.createElement('div');
+          row.className = 'radar-row';
+          const statusText = isOnline
+            ? '🟢 آنلاینه'
+            : (lastSeen ? relativeTimeFa(now - lastSeen) : 'هنوز باز نکرده');
+          row.innerHTML = `
+            <div class="radar-name-wrap">
+              <span class="status-dot${isOnline ? ' online' : ''}"></span>
+              <span class="radar-name">${name}</span>
+            </div>
+            <span class="radar-status${isOnline ? ' online-text' : ''}">${statusText}</span>`;
+          container.appendChild(row);
+        });
+      } catch (e) {
+        console.error("خطا در دریافت حضور", e);
+      }
+    }
+
+    sendPresence();
+    loadPresence();
+    setInterval(sendPresence, 10000); // هر ۱۰ ثانیه اعلام حضور
+    setInterval(loadPresence, 8000);  // هر ۸ ثانیه بروزرسانی رادار
 
     // ---------- جمله‌ی روزانه ----------
     const dailyQuotes = [
