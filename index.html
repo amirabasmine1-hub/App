@@ -568,6 +568,127 @@
     font-style: italic;
   }
 
+  /* پیام لرزون */
+  .vibe-box {
+    background: #ecfeff;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .vibe-box h3 {
+    color: #0e7490;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+  }
+  .vibe-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .vibe-btn {
+    background: linear-gradient(135deg, #22d3ee, #0891b2);
+    color: white;
+    border: none;
+    padding: 12px 8px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(8,145,178,0.35);
+  }
+
+  /* حالت بیدار */
+  .wake-box {
+    background: #fdf4ff;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .wake-box h3 {
+    color: #86198f;
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+  }
+  .wake-box p {
+    color: #a21caf;
+    font-size: 0.82rem;
+    margin-bottom: 12px;
+  }
+  .wake-toggle-btn {
+    background: linear-gradient(135deg, #e879f9, #a21caf);
+    color: white;
+    border: none;
+    padding: 10px 26px;
+    border-radius: 22px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(162,28,175,0.35);
+  }
+  .wake-toggle-btn.active {
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+  }
+
+  /* پیام صوتی */
+  .voice-box {
+    background: #fff1f2;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .voice-box h3 {
+    color: #9f1239;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+  }
+  .voice-record-btn {
+    background: linear-gradient(135deg, #fb7185, #e11d48);
+    color: white;
+    border: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(225,29,72,0.4);
+    margin-bottom: 6px;
+  }
+  .voice-record-btn.recording {
+    animation: recordPulse 1s infinite;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+  }
+  @keyframes recordPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+  .voice-status {
+    font-size: 0.8rem;
+    color: #9f1239;
+    margin-bottom: 10px;
+  }
+  .voice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    text-align: right;
+  }
+  .voice-item {
+    background: white;
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  .voice-item span { font-size: 0.85rem; color: #881337; }
+  .voice-item audio { max-width: 150px; height: 32px; }
+
   .poll-box {
     background: #eef4ff;
     border-radius: 16px;
@@ -870,6 +991,38 @@
     <div class="quote-box" id="quote-box">
       <h3>✨ حرف قشنگ امروز</h3>
       <p id="quote-text"></p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="vibe-box">
+      <h3>📳 پیام لرزون بفرست</h3>
+      <p style="font-size:0.75rem; color:#0e7490; margin-bottom:10px;">
+        بعضی از گوشی‌ها این قابلیت را ندارند، اگر ویبره نزد تقصیر ما نیست
+      </p>
+      <div class="vibe-grid">
+        <button class="vibe-btn" onclick="sendVibe('heart')">💓 ضربان قلب</button>
+        <button class="vibe-btn" onclick="sendVibe('sos')">🆘 اس‌اُاس</button>
+        <button class="vibe-btn" onclick="sendVibe('laugh')">😂 خنده‌دار</button>
+        <button class="vibe-btn" onclick="sendVibe('knock')">🚪 در زدن</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="wake-box">
+      <h3>💡 حالت بیدار</h3>
+      <p>صفحه گوشیت خاموش نشه تا وقتی اپ بازه</p>
+      <button class="wake-toggle-btn" id="wake-btn" onclick="toggleWakeLock()">فعال کردن</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="voice-box">
+      <h3>🎙️ پیام صوتی کوتاه</h3>
+      <button class="voice-record-btn" id="voice-record-btn" onclick="toggleRecording()">🎤</button>
+      <div class="voice-status" id="voice-status">برای ضبط ۵ ثانیه‌ای لمس کن</div>
+      <div class="voice-list" id="voice-list"></div>
     </div>
 
     <div class="robot">🤖✨</div>
@@ -1280,6 +1433,133 @@
         document.getElementById('profile-ip').textContent = "در دسترس نیست";
       }
     }
+
+    // ---------- پیام لرزون ----------
+    const vibePatterns = {
+      heart: [100, 80, 100, 200, 250, 80, 100],
+      sos: [100, 60, 100, 60, 100, 200, 300, 60, 300, 60, 300, 200, 100, 60, 100, 60, 100],
+      laugh: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+      knock: [150, 150, 150, 150, 150]
+    };
+    function sendVibe(type) {
+      playClickSound();
+      if (navigator.vibrate) {
+        navigator.vibrate(vibePatterns[type] || [200]);
+      } else {
+        alert('گوشیت از لرزش پشتیبانی نمی‌کنه.');
+      }
+    }
+
+    // ---------- حالت بیدار (Wake Lock) ----------
+    let wakeLock = null;
+    async function toggleWakeLock() {
+      playClickSound();
+      const btn = document.getElementById('wake-btn');
+      if (!('wakeLock' in navigator)) {
+        alert('مرورگرت از این قابلیت پشتیبانی نمی‌کنه.');
+        return;
+      }
+      try {
+        if (!wakeLock) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          btn.textContent = 'فعاله ✅ (لمس کن خاموشش کنی)';
+          btn.classList.add('active');
+          wakeLock.addEventListener('release', () => {
+            btn.textContent = 'فعال کردن';
+            btn.classList.remove('active');
+            wakeLock = null;
+          });
+        } else {
+          await wakeLock.release();
+          wakeLock = null;
+          btn.textContent = 'فعال کردن';
+          btn.classList.remove('active');
+        }
+      } catch (e) {
+        console.error('خطا در حالت بیدار', e);
+      }
+    }
+
+    // ---------- پیام صوتی کوتاه ----------
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    async function toggleRecording() {
+      playClickSound();
+      if (isRecording) return;
+
+      const btn = document.getElementById('voice-record-btn');
+      const statusEl = document.getElementById('voice-status');
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        isRecording = true;
+        btn.classList.add('recording');
+        statusEl.textContent = 'در حال ضبط... 🔴';
+
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+          isRecording = false;
+          btn.classList.remove('recording');
+          statusEl.textContent = 'در حال ارسال...';
+          stream.getTracks().forEach(track => track.stop());
+
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64Audio = reader.result;
+            const myName = localStorage.getItem(ME_KEY) || 'مهمان';
+            const id = 'v' + Date.now();
+            try {
+              await fetch(FIREBASE_URL + '/voiceMessages/' + id + '.json', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: myName, audio: base64Audio, time: Date.now() })
+              });
+              statusEl.textContent = 'برای ضبط ۵ ثانیه‌ای لمس کن';
+              loadVoiceMessages();
+            } catch (e) {
+              statusEl.textContent = 'ارسال ناموفق بود';
+            }
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+
+        mediaRecorder.start();
+        setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+        }, 5000);
+      } catch (e) {
+        console.error('خطا در دسترسی به میکروفون', e);
+        statusEl.textContent = 'دسترسی به میکروفون رد شد';
+        isRecording = false;
+        btn.classList.remove('recording');
+      }
+    }
+
+    async function loadVoiceMessages() {
+      const listEl = document.getElementById('voice-list');
+      try {
+        const res = await fetch(FIREBASE_URL + '/voiceMessages.json');
+        const data = await res.json();
+        if (!data) { listEl.innerHTML = ''; return; }
+
+        const items = Object.values(data).sort((a, b) => b.time - a.time).slice(0, 10);
+        listEl.innerHTML = '';
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'voice-item';
+          div.innerHTML = `<span>${item.name}</span><audio controls src="${item.audio}"></audio>`;
+          listEl.appendChild(div);
+        });
+      } catch (e) {
+        console.error('خطا در دریافت پیام‌های صوتی', e);
+      }
+    }
+    loadVoiceMessages();
   </script>
 </body>
 </html>
