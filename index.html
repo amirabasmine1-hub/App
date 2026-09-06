@@ -123,6 +123,31 @@
     width: 100%;
     max-width: 300px;
   }
+  .vpn-notice {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(251,191,36,0.5);
+    color: #fef3c7;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    padding: 12px 16px;
+    border-radius: 14px;
+    max-width: 300px;
+    margin-bottom: 14px;
+  }
+  .vpn-check-btn {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 8px;
+  }
+  #vpn-check-result {
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    min-height: 20px;
+    font-weight: bold;
+  }
+  #vpn-check-result.ok { color: #86efac; }
+  #vpn-check-result.fail { color: #fca5a5; }
+  #vpn-check-result.checking { color: #fde68a; }
   .start-btn {
     padding: 14px;
     border-radius: 16px;
@@ -868,6 +893,14 @@
     <div class="start-emoji">👋🏠</div>
     <div class="start-title">به اپ خانوادگی خوش آمدید!</div>
     <div class="start-subtitle">گروه پسر خاله‌ها و خواهرها</div>
+
+    <div class="vpn-notice">
+      ⚠️ برای استفاده از بیشتر امکانات اپ (نظرسنجی، اخبار، پیام صوتی و ...) باید <b>وی‌پی‌ان روشن</b> باشه.
+      <br>قبل از شروع، اتصالت رو چک کن:
+    </div>
+    <button class="start-btn secondary vpn-check-btn" onclick="checkVpnConnection()">🔍 بررسی اتصال</button>
+    <div id="vpn-check-result"></div>
+
     <div class="start-menu">
       <button class="start-btn primary" onclick="startApp()">🚀 شروع</button>
       <button class="start-btn secondary" onclick="openModal('settings-modal')">⚙️ تنظیمات</button>
@@ -912,6 +945,16 @@
   <div id="end-screen">
     <div class="emoji">👋</div>
     <p>در حال بستن اپ...<br><span style="font-size:0.8rem;color:#9ca3af;">اگه بسته نشد، از دکمه‌ی بازگشت گوشیت یا Home استفاده کن</span></p>
+  </div>
+
+  <!-- مودال خطای VPN -->
+  <div class="modal-overlay" id="vpn-error-modal">
+    <div class="modal-box">
+      <h3 style="color:#b91c1c;">⛔ خطا</h3>
+      <p>شما نمی‌توانید از آپ استفاده کنید، وی‌پی‌ان را بزنید و دوباره امتحان کنید.</p>
+      <p style="font-size:0.78rem; color:#9ca3af; direction:ltr;">Error VPN — Code: vpn_7223</p>
+      <button class="modal-close-btn" onclick="closeModal('vpn-error-modal')">باشه</button>
+    </div>
   </div>
 
   <div class="card" id="main-card" style="display:none;">
@@ -1344,10 +1387,28 @@
     showDailyQuote();
 
     // ---------- مدیریت صفحه شروع ----------
-    function startApp() {
+    async function startApp() {
       playClickSound();
-      document.getElementById('start-screen').classList.add('hidden');
-      document.getElementById('main-card').style.display = 'block';
+      const btn = document.querySelector('.start-btn.primary');
+      const originalText = btn.textContent;
+      btn.textContent = '⏳ در حال بررسی اتصال...';
+      btn.disabled = true;
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+
+      try {
+        await fetch(FIREBASE_URL + '/.json', { signal: controller.signal, mode: 'cors' });
+        clearTimeout(timeout);
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('main-card').style.display = 'block';
+      } catch (e) {
+        clearTimeout(timeout);
+        openModal('vpn-error-modal');
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
     }
 
     function openModal(id) {
@@ -1560,6 +1621,28 @@
       }
     }
     loadVoiceMessages();
+
+    // ---------- بررسی اتصال (وی‌پی‌ان) ----------
+    async function checkVpnConnection() {
+      playClickSound();
+      const resultEl = document.getElementById('vpn-check-result');
+      resultEl.className = 'checking';
+      resultEl.textContent = '⏳ در حال بررسی...';
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+
+      try {
+        await fetch(FIREBASE_URL + '/.json', { signal: controller.signal, mode: 'cors' });
+        clearTimeout(timeout);
+        resultEl.className = 'ok';
+        resultEl.textContent = '✅ وی‌پی‌ان روشنه، می‌تونی وارد شی';
+      } catch (e) {
+        clearTimeout(timeout);
+        resultEl.className = 'fail';
+        resultEl.textContent = '❌ وی‌پی‌ان روشن نیست یا وصل نشده، لطفاً روشنش کن';
+      }
+    }
   </script>
 </body>
 </html>
