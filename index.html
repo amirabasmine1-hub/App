@@ -716,6 +716,76 @@
 
   /* نشان‌های خانواده */
   /* رادار زنده خانواده */
+  /* موقعیت مکانی */
+  .location-box {
+    background: #eff6ff;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 20px 0;
+  }
+  .location-box h3 {
+    color: #1e40af;
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+  }
+  .location-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .location-input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1.5px solid #bfdbfe;
+    font-family: inherit;
+    font-size: 0.88rem;
+  }
+  .location-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .location-remove-btn {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .location-list { display: flex; flex-direction: column; gap: 8px; }
+  .location-item {
+    background: white;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .location-item-info { text-align: right; }
+  .location-item-name { font-size: 0.9rem; font-weight: bold; color: #1e3a8a; }
+  .location-item-label { font-size: 0.8rem; color: #2563eb; }
+  .location-item-time { font-size: 0.72rem; color: #9ca3af; }
+  .location-map-link {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
   .radar-box {
     background: #f0fdf4;
     border-radius: 16px;
@@ -1175,6 +1245,18 @@
 
     <div class="divider"></div>
 
+    <div class="location-box">
+      <h3>📍 من الان اینجام</h3>
+      <div class="location-input-row">
+        <input type="text" class="location-input" id="location-label-input" placeholder="مثلاً: خرید، خونه، سرکار">
+        <button class="location-btn" onclick="shareMyLocation()">اشتراک</button>
+      </div>
+      <button class="location-remove-btn" onclick="removeMyLocation()">🗑️ حذف موقعیت من</button>
+      <div class="location-list" id="location-list"></div>
+    </div>
+
+    <div class="divider"></div>
+
     <div class="badges-box">
       <h3>🏅 نشان‌های خانواده</h3>
       <div class="badge-list" id="badge-list"></div>
@@ -1608,6 +1690,85 @@
     loadPresence();
     setInterval(sendPresence, 10000); // هر ۱۰ ثانیه اعلام حضور
     setInterval(loadPresence, 8000);  // هر ۸ ثانیه بروزرسانی رادار
+
+    // ---------- موقعیت مکانی ----------
+    function shareMyLocation() {
+      playClickSound();
+      const myName = localStorage.getItem(ME_KEY);
+      if (!myName) { alert('اول باید مشخص بشه شما کدوم عضو هستید.'); return; }
+
+      const label = document.getElementById('location-label-input').value.trim() || 'بدون توضیح';
+
+      if (!navigator.geolocation) {
+        alert('گوشیت از موقعیت مکانی پشتیبانی نمی‌کنه.');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const data = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          label: label,
+          time: Date.now()
+        };
+        try {
+          await fetch(FIREBASE_URL + "/locations/" + encodeURIComponent(myName) + ".json", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+          document.getElementById('location-label-input').value = '';
+          loadLocations();
+        } catch (e) {
+          alert('ارسال موقعیت ناموفق بود.');
+        }
+      }, (err) => {
+        alert('دسترسی به موقعیت مکانی داده نشد یا با خطا مواجه شد.');
+      });
+    }
+
+    async function removeMyLocation() {
+      playClickSound();
+      const myName = localStorage.getItem(ME_KEY);
+      if (!myName) return;
+      try {
+        await fetch(FIREBASE_URL + "/locations/" + encodeURIComponent(myName) + ".json", {
+          method: "DELETE"
+        });
+        loadLocations();
+      } catch (e) {
+        console.error('خطا در حذف موقعیت', e);
+      }
+    }
+
+    async function loadLocations() {
+      const container = document.getElementById('location-list');
+      try {
+        const res = await fetch(FIREBASE_URL + "/locations.json");
+        const data = await res.json();
+        if (!data) { container.innerHTML = '<p style="font-size:0.82rem;color:#9ca3af;text-align:center;">هنوز کسی موقعیتش رو به اشتراک نذاشته</p>'; return; }
+
+        container.innerHTML = '';
+        Object.keys(data).forEach(name => {
+          const loc = data[name];
+          const mapUrl = `https://www.google.com/maps?q=${loc.lat},${loc.lng}`;
+          const item = document.createElement('div');
+          item.className = 'location-item';
+          item.innerHTML = `
+            <div class="location-item-info">
+              <div class="location-item-name">${name}</div>
+              <div class="location-item-label">📍 ${loc.label}</div>
+              <div class="location-item-time">${relativeTimeFa(Date.now() - loc.time)}</div>
+            </div>
+            <a class="location-map-link" href="${mapUrl}" target="_blank">نقشه</a>`;
+          container.appendChild(item);
+        });
+      } catch (e) {
+        console.error('خطا در دریافت موقعیت‌ها', e);
+      }
+    }
+    loadLocations();
+    setInterval(loadLocations, 15000);
 
     // ---------- جمله‌ی روزانه ----------
     const dailyQuotes = [
