@@ -3,2049 +3,3980 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
 <title>گروه خانوادگی</title>
 
-<!-- تنظیمات مخصوص نصب روی آیفون (Add to Home Screen) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="گروه خانوادگی">
-<link rel="apple-touch-icon" href="icon.png">
 
-<!-- PWA Manifest -->
+<link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#764ba2">
+
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: Tahoma, Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  .card {
-    background: rgba(255,255,255,0.97);
-    border-radius: 24px;
-    padding: 40px 30px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    animation: popIn 0.6s ease;
-    transition: background 0.4s ease, color 0.4s ease;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  /* دکمه تغییر تم */
-  .theme-toggle {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.9);
-    border: none;
-    font-size: 1.3rem;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease, background 0.4s ease;
-  }
-  .theme-toggle:active { transform: scale(0.85) rotate(20deg); }
+body {
+  font-family: Tahoma, Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
 
-  /* دکمه پروفایل بالا سمت چپ */
-  .profile-btn {
-    position: fixed;
-    top: 16px;
-    left: 70px;
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.9);
-    border: none;
-    font-size: 1.3rem;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-  /* صفحه‌ی شروع (Start Screen) */
-  #start-screen {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at 50% 30%, #8b5cf6 0%, #6d28d9 40%, #3730a3 75%, #1e1b4b 100%);
-    z-index: 90;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    text-align: center;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-  }
-  #start-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-  .start-emoji {
-    font-size: 3.5rem;
-    margin-bottom: 14px;
-    animation: iconPop 2s ease-in-out infinite;
-  }
-  .start-title {
-    color: white;
-    font-size: 1.6rem;
-    font-weight: bold;
-    margin-bottom: 8px;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
-  }
-  .start-subtitle {
-    color: #ddd6fe;
-    font-size: 0.9rem;
-    margin-bottom: 34px;
-  }
-  .start-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    max-width: 300px;
-  }
-  .vpn-notice {
-    background: rgba(255,255,255,0.12);
-    border: 1.5px solid rgba(251,191,36,0.5);
-    color: #fef3c7;
-    font-size: 0.82rem;
-    line-height: 1.7;
-    padding: 12px 16px;
-    border-radius: 14px;
-    max-width: 300px;
-    margin-bottom: 14px;
-  }
-  .vpn-check-btn {
-    width: 100%;
-    max-width: 300px;
-    margin-bottom: 8px;
-  }
-  #vpn-check-result {
-    font-size: 0.85rem;
-    margin-bottom: 20px;
-    min-height: 20px;
-    font-weight: bold;
-  }
-  #vpn-check-result.ok { color: #86efac; }
-  #vpn-check-result.fail { color: #fca5a5; }
-  #vpn-check-result.checking { color: #fde68a; }
-  .start-btn {
-    padding: 14px;
-    border-radius: 16px;
-    border: none;
-    font-size: 1rem;
-    font-family: inherit;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: transform 0.15s ease;
-  }
-  .start-btn:active { transform: scale(0.96); }
-  .start-btn.primary {
-    background: white;
-    color: #6d28d9;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-  }
-  .start-btn.secondary {
-    background: rgba(255,255,255,0.12);
-    color: white;
-    border: 1.5px solid rgba(255,255,255,0.35);
-  }
-  .start-btn.danger {
-    background: rgba(239,68,68,0.15);
-    color: #fecaca;
-    border: 1.5px solid rgba(239,68,68,0.4);
-  }
+.card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 24px;
+  padding: 40px 30px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: popIn 0.6s ease;
+  transition: background 0.4s ease, color 0.4s ease;
+}
 
-  /* مودال‌های تنظیمات، درباره، پروفایل */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 150;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal-box {
-    background: white;
-    border-radius: 20px;
-    padding: 26px 22px;
-    max-width: 340px;
-    width: 100%;
-    text-align: center;
-    animation: popIn 0.35s ease;
-  }
-  .modal-box h3 {
-    color: #4c1d95;
-    font-size: 1.15rem;
-    margin-bottom: 16px;
-  }
-  .modal-box p, .modal-box .info-row {
-    color: #444;
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-    line-height: 1.6;
-  }
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    background: #f3f4f6;
-    padding: 8px 12px;
-    border-radius: 10px;
-    text-align: right;
-  }
-  .info-row span:first-child { color: #6b7280; font-size: 0.82rem; }
-  .info-row span:last-child { font-weight: bold; color: #374151; direction: ltr; }
-  .modal-close-btn {
-    margin-top: 14px;
-    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-    color: white;
-    border: none;
-    padding: 10px 26px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-family: inherit;
-    cursor: pointer;
-  }
+.theme-toggle,
+.profile-btn {
+  position: fixed;
+  top: 16px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  /* پایان اپ */
-  #end-screen {
-    position: fixed;
-    inset: 0;
-    background: #111827;
-    z-index: 200;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    color: white;
-  }
-  #end-screen.show { display: flex; }
-  #end-screen .emoji { font-size: 3rem; margin-bottom: 12px; }
+.theme-toggle { left: 16px; }
+.profile-btn { left: 70px; }
 
-  /* حالت شب */
-  body.dark-mode {
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  }
-  body.dark-mode .card {
-    background: rgba(30,27,55,0.97);
-    color: #e5e7eb;
-  }
-  body.dark-mode h1 { color: #c4b5fd; }
-  body.dark-mode h2 { color: #a78bfa; }
-  body.dark-mode .members,
-  body.dark-mode .prices,
-  body.dark-mode .poll-box,
-  body.dark-mode .news-box,
-  body.dark-mode .birthday-box,
-  body.dark-mode .visits-box {
-    background: rgba(255,255,255,0.06);
-  }
-  body.dark-mode .members h3 { color: #ddd6fe; }
-  body.dark-mode .news-item {
-    background: rgba(255,255,255,0.08);
-    color: #d1fae5;
-  }
-  body.dark-mode .poll-btn {
-    background: rgba(255,255,255,0.06);
-    color: #dbeafe;
-  }
-  body.dark-mode .tagline,
-  body.dark-mode .footer-note,
-  body.dark-mode .price-note,
-  body.dark-mode .poll-count {
-    color: #9ca3af;
-  }
-  body.dark-mode .theme-toggle {
-    background: rgba(255,255,255,0.15);
-  }
-  @keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .emoji {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    animation: bounce 2s infinite;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  h1 {
-    color: #6a1b9a;
-    font-size: 1.6rem;
-    margin-bottom: 8px;
-  }
-  h2 {
-    color: #764ba2;
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-    font-weight: 600;
-  }
-  .divider {
-    height: 3px;
-    background: linear-gradient(90deg, transparent, #764ba2, transparent);
-    margin: 20px 0;
-    border-radius: 2px;
-  }
-  .members {
-    background: #f5f0fa;
-    border-radius: 16px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-  .members h3 {
-    color: #4a148c;
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-  }
-  .member-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-  }
-  .member-tag {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.95rem;
-    box-shadow: 0 2px 8px rgba(118,75,162,0.4);
-  }
-  .owner {
-    color: #d81b60;
-    font-weight: bold;
-    font-size: 1.05rem;
-    margin-top: 15px;
-  }
-  .tagline {
-    margin-top: 20px;
-    font-size: 0.95rem;
-    color: #555;
-    font-style: italic;
-    line-height: 1.6;
-  }
-  .robot {
-    font-size: 1.5rem;
-    margin-top: 10px;
-  }
-  .footer-note {
-    font-size: 0.85rem;
-    color: #888;
-    margin-top: 15px;
-  }
-  .prices {
-    background: #fff8f0;
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
-  }
-  .prices h3 {
-    color: #b45309;
-    margin-bottom: 12px;
-    font-size: 1.05rem;
-  }
-  .price-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .price-tag {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: white;
-    padding: 10px 8px;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    text-decoration: none;
-    box-shadow: 0 2px 8px rgba(217,119,6,0.4);
-    display: block;
-  }
-  .price-note {
-    font-size: 0.75rem;
-    color: #999;
-    margin-top: 10px;
-  }
+.theme-toggle:active {
+  transform: scale(0.85) rotate(20deg);
+}
 
-  /* صفحه لودینگ خفن‌تر */
-  #loading-screen {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at 50% 40%, #8b5cf6 0%, #6d28d9 35%, #4c1d95 70%, #1e1b4b 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    transition: opacity 0.7s ease, visibility 0.7s ease;
-    overflow: hidden;
-  }
-  #loading-screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-  .loading-glow {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
-    animation: glowPulse 2.5s ease-in-out infinite;
-  }
-  @keyframes glowPulse {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.3); opacity: 1; }
-  }
-  .loading-ring {
-    position: relative;
-    width: 110px;
-    height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .loading-ring::before,
-  .loading-ring::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 3px solid transparent;
-  }
-  .loading-ring::before {
-    border-top-color: #fff;
-    border-right-color: rgba(255,255,255,0.4);
-    animation: spin 1.1s linear infinite;
-  }
-  .loading-ring::after {
-    inset: -12px;
-    border-bottom-color: #f0abfc;
-    border-left-color: rgba(240,171,252,0.3);
-    animation: spin 1.7s linear infinite reverse;
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  .loading-icon {
-    width: 84px;
-    height: 84px;
-    border-radius: 50%;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.3rem;
-    box-shadow: 0 0 30px rgba(255,255,255,0.6), 0 10px 40px rgba(0,0,0,0.3);
-    animation: iconPop 1.4s ease-in-out infinite;
-    position: relative;
-    z-index: 2;
-  }
-  @keyframes iconPop {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15) rotate(8deg); }
-  }
-  .loading-text {
-    color: white;
-    margin-top: 26px;
-    font-size: 1.15rem;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
-    position: relative;
-    z-index: 2;
-  }
-  .loading-dots span {
-    animation: dotFade 1.4s infinite;
+#start-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 30%,
+    #8b5cf6 0%,
+    #6d28d9 40%,
+    #3730a3 75%,
+    #1e1b4b 100%
+  );
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#start-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.start-emoji {
+  font-size: 3.5rem;
+  margin-bottom: 14px;
+  animation: iconPop 2s ease-in-out infinite;
+}
+
+.start-title {
+  color: white;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.start-subtitle {
+  color: #ddd6fe;
+  font-size: 0.9rem;
+  margin-bottom: 34px;
+}
+
+.start-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.vpn-notice {
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(251,191,36,0.5);
+  color: #fef3c7;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  padding: 12px 16px;
+  border-radius: 14px;
+  max-width: 300px;
+  margin-bottom: 14px;
+}
+
+.vpn-check-btn {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 8px;
+}
+
+#vpn-check-result {
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  min-height: 20px;
+  font-weight: bold;
+}
+
+#vpn-check-result.ok { color: #86efac; }
+#vpn-check-result.fail { color: #fca5a5; }
+#vpn-check-result.checking { color: #fde68a; }
+
+.start-btn {
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s ease;
+}
+
+.start-btn:active {
+  transform: scale(0.96);
+}
+
+.start-btn.primary {
+  background: white;
+  color: #6d28d9;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.start-btn.secondary {
+  background: rgba(255,255,255,0.12);
+  color: white;
+  border: 1.5px solid rgba(255,255,255,0.35);
+}
+
+.start-btn.danger {
+  background: rgba(239,68,68,0.15);
+  color: #fecaca;
+  border: 1.5px solid rgba(239,68,68,0.4);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 150;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 20px;
+  padding: 26px 22px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  animation: popIn 0.35s ease;
+}
+
+.modal-box h3 {
+  color: #4c1d95;
+  font-size: 1.15rem;
+  margin-bottom: 16px;
+}
+
+.modal-box p,
+.modal-box .info-row {
+  color: #444;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 10px;
+  text-align: right;
+}
+
+.info-row span:first-child {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.info-row span:last-child {
+  font-weight: bold;
+  color: #374151;
+  direction: ltr;
+}
+
+.modal-close-btn {
+  margin-top: 14px;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  color: white;
+  border: none;
+  padding: 10px 26px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+#end-screen {
+  position: fixed;
+  inset: 0;
+  background: #111827;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: white;
+}
+
+#end-screen.show {
+  display: flex;
+}
+
+#end-screen .emoji {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+body.dark-mode {
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+}
+
+body.dark-mode .card {
+  background: rgba(30,27,55,0.97);
+  color: #e5e7eb;
+}
+
+body.dark-mode h1 { color: #c4b5fd; }
+body.dark-mode h2 { color: #a78bfa; }
+
+body.dark-mode .members,
+body.dark-mode .prices,
+body.dark-mode .poll-box,
+body.dark-mode .news-box,
+body.dark-mode .birthday-box,
+body.dark-mode .visits-box {
+  background: rgba(255,255,255,0.06);
+}
+
+body.dark-mode .members h3 {
+  color: #ddd6fe;
+}
+
+body.dark-mode .news-item {
+  background: rgba(255,255,255,0.08);
+  color: #d1fae5;
+}
+
+body.dark-mode .poll-btn {
+  background: rgba(255,255,255,0.06);
+  color: #dbeafe;
+}
+
+body.dark-mode .tagline,
+body.dark-mode .footer-note,
+body.dark-mode .price-note,
+body.dark-mode .poll-count {
+  color: #9ca3af;
+}
+
+body.dark-mode .theme-toggle,
+body.dark-mode .profile-btn {
+  background: rgba(255,255,255,0.15);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
     opacity: 0;
   }
-  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes dotFade {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
-  .loading-spark {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 0 8px 2px rgba(255,255,255,0.8);
-    animation: sparkFloat linear infinite;
-  }
-  @keyframes sparkFloat {
-    0% { transform: translateY(0) scale(0); opacity: 0; }
-    20% { opacity: 1; transform: scale(1); }
-    100% { transform: translateY(-140px) scale(0.3); opacity: 0; }
+}
+
+.emoji {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+h1 {
+  color: #6a1b9a;
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+
+h2 {
+  color: #764ba2;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.divider {
+  height: 3px;
+  background: linear-gradient(90deg,transparent,#764ba2,transparent);
+  margin: 20px 0;
+  border-radius: 2px;
+}
+
+.members {
+  background: #f5f0fa;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.members h3 {
+  color: #4a148c;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.member-tag {
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+}
+
+.owner {
+  color: #d81b60;
+  font-weight: bold;
+  font-size: 1.05rem;
+  margin-top: 15px;
+}
+
+.tagline {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: #555;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.robot {
+  font-size: 1.5rem;
+  margin-top: 10px;
+}
+
+.footer-note {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 15px;
+}
+
+.prices {
+  background: #fff8f0;
+  border-radius: 16px;
+  padding: 18px;
+  margin: 20px 0;
+}
+
+.prices h3 {
+  color: #b45309;
+  margin-bottom: 12px;
+  font-size: 1.05rem;
+}
+
+.price-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.price-tag {
+  background: linear-gradient(135deg,#f59e0b,#d97706);
+  color: white;
+  padding: 10px 8px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: block;
+}
+
+.price-note {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 10px;
+}
+
+/* ---------- لودینگ ---------- */
+
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 40%,
+    #8b5cf6 0%,
+    #6d28d9 35%,
+    #4c1d95 70%,
+    #1e1b4b 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+  overflow: hidden;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255,255,255,0.25) 0%,
+    transparent 70%
+  );
+  animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,100% {
+    transform: scale(1);
+    opacity: 0.6;
   }
 
-  /* ذرات شناور پس‌زمینه */
-  .particle {
-    position: fixed;
-    bottom: -50px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.35);
-    animation: floatUp linear infinite;
-    pointer-events: none;
-    z-index: 0;
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
   }
-  @keyframes floatUp {
-    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(-110vh) translateX(20px) rotate(360deg); opacity: 0; }
-  }
-  .card { position: relative; z-index: 1; }
+}
 
-  .birthday-box {
-    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
-    display: none;
-  }
-  .birthday-box.show { display: block; animation: popIn 0.6s ease; }
-  .birthday-box h3 {
-    color: #ad1457;
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-  }
-  .birthday-box .bname {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #880e4f;
+.loading-ring {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-ring::before,
+.loading-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+}
+
+.loading-ring::before {
+  border-top-color: #fff;
+  border-right-color: rgba(255,255,255,0.4);
+  animation: spin 1.1s linear infinite;
+}
+
+.loading-ring::after {
+  inset: -12px;
+  border-bottom-color: #f0abfc;
+  border-left-color: rgba(240,171,252,0.3);
+  animation: spin 1.7s linear infinite reverse;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-icon {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.3rem;
+  box-shadow:
+    0 0 30px rgba(255,255,255,0.6),
+    0 10px 40px rgba(0,0,0,0.3);
+  animation: iconPop 1.4s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes iconPop {
+  0%,100% {
+    transform: scale(1);
   }
 
-  /* نوتیفیکیشن داخل اپ */
-  #toast-container {
-    position: fixed;
-    top: 16px;
-    right: 50%;
-    transform: translateX(50%);
-    width: min(90%, 380px);
-    z-index: 200;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  50% {
+    transform: scale(1.15) rotate(8deg);
   }
-  .toast {
-    background: rgba(30,30,45,0.95);
-    color: white;
-    padding: 12px 16px;
-    border-radius: 14px;
-    font-size: 0.9rem;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transform: translateY(-120%);
+}
+
+.loading-text {
+  color: white;
+  margin-top: 26px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
+}
+
+.loading-dots span {
+  animation: dotFade 1.4s infinite;
+  opacity: 0;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotFade {
+  0%,100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.loading-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 8px 2px rgba(255,255,255,0.8);
+  animation: sparkFloat linear infinite;
+}
+
+@keyframes sparkFloat {
+  0% {
+    transform: translateY(0) scale(0);
     opacity: 0;
-    transition: transform 0.4s ease, opacity 0.4s ease;
-    border-right: 4px solid #a78bfa;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast-emoji { font-size: 1.3rem; flex-shrink: 0; }
-
-  .quote-box {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 16px;
-    padding: 20px;
-    margin: 20px 0;
-    text-align: center;
-  }
-  .quote-box h3 {
-    color: #92400e;
-    font-size: 1.05rem;
-    margin-bottom: 10px;
-  }
-  .quote-box p {
-    color: #78350f;
-    font-size: 0.95rem;
-    line-height: 1.8;
-    font-style: italic;
   }
 
-  /* پیام لرزون */
-  .vibe-box {
-    background: #ecfeff;
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
-    text-align: center;
-  }
-  .vibe-box h3 {
-    color: #0e7490;
-    font-size: 1.05rem;
-    margin-bottom: 12px;
-  }
-  .vibe-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .vibe-btn {
-    background: linear-gradient(135deg, #22d3ee, #0891b2);
-    color: white;
-    border: none;
-    padding: 12px 8px;
-    border-radius: 12px;
-    font-size: 0.88rem;
-    font-family: inherit;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(8,145,178,0.35);
+  20% {
+    opacity: 1;
+    transform: scale(1);
   }
 
-  /* حالت بیدار */
-  .wake-box {
-    background: #fdf4ff;
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
-    text-align: center;
+  100% {
+    transform: translateY(-140px) scale(0.3);
+    opacity: 0;
   }
-  .wake-box h3 {
-    color: #86198f;
-    font-size: 1.05rem;
-    margin-bottom: 10px;
-  }
-  .wake-box p {
-    color: #a21caf;
-    font-size: 0.82rem;
-    margin-bottom: 12px;
-  }
-  .wake-toggle-btn {
-    background: linear-gradient(135deg, #e879f9, #a21caf);
-    color: white;
-    border: none;
-    padding: 10px 26px;
-    border-radius: 22px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(162,28,175,0.35);
-  }
-  .wake-toggle-btn.active {
-    background: linear-gradient(135deg, #4ade80, #16a34a);
+}
+
+.particle {
+  position: fixed;
+  bottom: -50px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  animation: floatUp linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
   }
 
-  /* پیام صوتی */
-  .voice-box {
-    background: #fff1f2;
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
-    text-align: center;
-  }
-  .voice-box h3 {
-    color: #9f1239;
-    font-size: 1.05rem;
-    margin-bottom: 12px;
-  }
-  .voice-record-btn {
-    background: linear-gradient(135deg, #fb7185, #e11d48);
-    color: white;
-    border: none;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(225,29,72,0.4);
-    margin-bottom: 6px;
-  }
-  .voice-record-btn.recording {
-    animation: recordPulse 1s infinite;
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
-  }
-  @keyframes recordPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
-  }
-  .voice-status {
-    font-size: 0.8rem;
-    color: #9f1239;
-    margin-bottom: 10px;
-  }
-  .voice-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 220px;
-    overflow-y: auto;
-    text-align: right;
-  }
-  .voice-item {
-    background: white;
-    border-radius: 12px;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: space-between;
-  }
-  .voice-item span { font-size: 0.85rem; color: #881337; }
-  .voice-item audio { max-width: 150px; height: 32px; }
+  10% { opacity: 1; }
 
-  /* نشان‌های خانواده */
-  /* رادار زنده خانواده */
-  /* موقعیت مکانی */
-  .location-box {
-    background: #eff6ff;
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
-  }
-  .location-box h3 {
-    color: #1e40af;
-    font-size: 1.05rem;
-    margin-bottom: 10px;
-  }
-  .location-input-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .location-input {
-    flex: 1;
-    padding: 10px 12px;
-    border-radius: 12px;
-    border: 1.5px solid #bfdbfe;
-    font-family: inherit;
-    font-size: 0.88rem;
-  }
-  .location-btn {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-size: 0.88rem;
-    font-family: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .location-remove-btn {
-    background: #fee2e2;
-    color: #b91c1c;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 0.82rem;
-    font-family: inherit;
-    cursor: pointer;
-    margin-bottom: 12px;
-  }
-  .location-list { display: flex; flex-direction: column; gap: 8px; }
-  .location-item {
-    background: white;
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .location-item-info { text-align: right; }
-  .location-item-name { font-size: 0.9rem; font-weight: bold; color: #1e3a8a; }
-  .location-item-label { font-size: 0.8rem; color: #2563eb; }
-  .location-item-time { font-size: 0.72rem; color: #9ca3af; }
-  .location-map-link {
-    background: #dbeafe;
-    color: #1d4ed8;
-    padding: 6px 12px;
-    border-radius: 10px;
-    font-size: 0.78rem;
-    text-decoration: none;
-    white-space: nowrap;
-  }
+  90% { opacity: 1; }
 
-  .radar-box {
-    background: #f0fdf4;
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
+  100% {
+    transform: translateY(-110vh) translateX(20px) rotate(360deg);
+    opacity: 0;
   }
-  .radar-box h3 {
-    color: #15803d;
-    font-size: 1.05rem;
-    margin-bottom: 12px;
-  }
-  .radar-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: white;
-    padding: 9px 14px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-  }
-  .radar-name-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #d1d5db;
-    flex-shrink: 0;
-  }
-  .status-dot.online {
-    background: #22c55e;
-    box-shadow: 0 0 0 rgba(34,197,94,0.6);
-    animation: onlinePulse 1.6s infinite;
-  }
-  @keyframes onlinePulse {
-    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
-    70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
-    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-  }
-  .radar-name { font-size: 0.92rem; color: #166534; font-weight: bold; }
-  .radar-status { font-size: 0.78rem; color: #6b7280; }
-  .radar-status.online-text { color: #16a34a; font-weight: bold; }
+}
 
-  .badges-box {
-    background: linear-gradient(135deg, #1e1b4b, #312e81);
-    border-radius: 16px;
-    padding: 20px;
-    margin: 20px 0;
-  }
-  .badges-box h3 {
-    color: #e0e7ff;
-    font-size: 1.05rem;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  .badge-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .badge-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(255,255,255,0.06);
-    padding: 10px 14px;
-    border-radius: 14px;
-  }
-  .badge-row.owner {
-    background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(96,165,250,0.18));
-    border: 1.5px solid rgba(251,191,36,0.5);
-  }
-  .badge-icon-wrap {
-    position: relative;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .badge-icon {
-    font-size: 1.8rem;
-    z-index: 2;
-    animation: badgeFloat 2.4s ease-in-out infinite;
-  }
-  .badge-icon.crown { animation: crownSpinGlow 3s ease-in-out infinite; }
-  .badge-icon.diamond {
-    position: absolute;
-    font-size: 1rem;
-    top: -6px;
-    right: -6px;
-    animation: diamondSparkle 1.4s ease-in-out infinite;
-  }
-  .badge-glow {
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(251,191,36,0.5), transparent 70%);
-    animation: glowPulse 2s ease-in-out infinite;
-    z-index: 1;
-  }
-  @keyframes badgeFloat {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-4px) rotate(-6deg); }
-  }
-  @keyframes crownSpinGlow {
-    0%, 100% { transform: scale(1) rotate(-4deg); filter: drop-shadow(0 0 2px gold); }
-    50% { transform: scale(1.15) rotate(4deg); filter: drop-shadow(0 0 8px gold); }
-  }
-  @keyframes diamondSparkle {
-    0%, 100% { transform: scale(0.8) rotate(0deg); opacity: 0.7; }
-    50% { transform: scale(1.3) rotate(20deg); opacity: 1; }
-  }
-  .badge-info { flex: 1; }
-  .badge-name {
-    color: white;
-    font-size: 0.95rem;
-    font-weight: bold;
-  }
-  .badge-title {
-    font-size: 0.78rem;
-    color: #a5b4fc;
-  }
-  .badge-row.owner .badge-title {
-    background: linear-gradient(90deg, #fbbf24, #60a5fa);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-weight: bold;
-  }
+.card {
+  position: relative;
+  z-index: 1;
+}
 
-  .poll-box {
-    background: #eef4ff;
-    border-radius: 16px;
-    padding: 18px;
-    margin: 20px 0;
-    text-align: right;
-  }
-  .poll-box h3 {
-    color: #1e40af;
-    font-size: 1.05rem;
-    margin-bottom: 14px;
-    text-align: center;
-  }
-  .poll-option {
-    margin-bottom: 10px;
-  }
-  .poll-btn {
-    width: 100%;
-    background: white;
-    border: 2px solid #93c5fd;
-    color: #1e3a8a;
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.2s;
-  }
-  .poll-btn:hover { background: #dbeafe; }
-  .poll-btn.voted {
-    background: linear-gradient(135deg, #3b82f6, #1e40af);
-    color: white;
-    border-color: #1e40af;
-  }
-  .poll-bar-wrap {
-    background: #e5e7eb;
-    border-radius: 8px;
-    height: 6px;
-    margin-top: 6px;
-    overflow: hidden;
-  }
-  .poll-bar {
-    background: linear-gradient(90deg, #60a5fa, #2563eb);
-    height: 100%;
-    transition: width 0.4s ease;
-  }
-  .poll-count {
-    font-size: 0.8rem;
-    color: #666;
-    margin-top: 3px;
-  }
+.birthday-box {
+  background: linear-gradient(135deg,#fce4ec,#f8bbd0);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 20px 0;
+  display: none;
+}
 
-  .news-box {
-    background: #f0fdf4;
-    border-radius: 16px;
-    padding: 16px;
-    margin: 20px 0;
-    text-align: right;
-  }
-  .news-box h3 {
-    color: #15803d;
-    font-size: 1.05rem;
-    margin-bottom: 12px;
-    text-align: center;
-  }
-  .news-menu {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    margin-bottom: 12px;
-    padding-bottom: 4px;
-  }
-  .news-tab {
-    background: white;
-    border: 1.5px solid #86efac;
-    color: #166534;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.82rem;
-    font-family: inherit;
-    white-space: nowrap;
-    cursor: pointer;
-  }
-  .news-tab.active {
-    background: linear-gradient(135deg, #22c55e, #15803d);
-    color: white;
-    border-color: #15803d;
-  }
-  .news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 320px;
-    overflow-y: auto;
-  }
-  .news-item {
-    display: block;
-    background: white;
-    padding: 10px 12px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: #14532d;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    border-right: 3px solid #22c55e;
-  }
-  .news-item:hover { background: #ecfdf5; }
-  .news-time {
-    display: block;
-    font-size: 0.72rem;
-    color: #999;
-    margin-top: 4px;
-  }
-  .news-loading {
-    text-align: center;
-    color: #888;
-    font-size: 0.85rem;
-    padding: 10px;
-  }
+.birthday-box.show {
+  display: block;
+  animation: popIn 0.6s ease;
+}
 
-  .visits-box {
-    background: #fef9c3;
-    border-radius: 16px;
-    padding: 16px;
-    margin: 20px 0;
-  }
-  .visits-box h3 {
-    color: #854d0e;
-    font-size: 1.05rem;
-    margin-bottom: 12px;
-  }
-  .visit-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: white;
-    padding: 8px 14px;
-    border-radius: 10px;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-  }
-  .visit-row.me {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    color: white;
-    font-weight: bold;
-  }
-  .visit-count-num {
-    background: #78350f;
-    color: white;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-  }
-  .visit-row.me .visit-count-num {
-    background: rgba(255,255,255,0.3);
-  }
+.birthday-box h3 {
+  color: #ad1457;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.birthday-box .bname {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #880e4f;
+}
+
+#toast-container {
+  position: fixed;
+  top: 16px;
+  right: 50%;
+  transform: translateX(50%);
+  width: min(90%,380px);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: rgba(30,30,45,0.95);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quote-box,
+.vibe-box,
+.wake-box,
+.voice-box,
+.location-box,
+.radar-box,
+.badges-box,
+.poll-box,
+.news-box,
+.visits-box {
+  border-radius: 16px;
+  padding: 18px;
+  margin: 20px 0;
+}
+
+.quote-box {
+  background: linear-gradient(135deg,#fef3c7,#fde68a);
+}
+
+.quote-box h3 {
+  color: #92400e;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.quote-box p {
+  color: #78350f;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.vibe-box {
+  background: #ecfeff;
+}
+
+.vibe-box h3 {
+  color: #0e7490;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+.vibe-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.vibe-btn {
+  background: linear-gradient(135deg,#22d3ee,#0891b2);
+  color: white;
+  border: none;
+  padding: 12px 8px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.wake-box {
+  background: #fdf4ff;
+  text-align: center;
+}
+
+.wake-box h3 {
+  color: #86198f;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.wake-box p {
+  color: #a21caf;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+.wake-toggle-btn {
+  background: linear-gradient(135deg,#e879f9,#a21caf);
+  color: white;
+  border: none;
+  padding: 10px 26px;
+  border-radius: 22px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.wake-toggle-btn.active {
+  background: linear-gradient(135deg,#4ade80,#16a34a);
+}
+
+.voice-box {
+  background: #fff1f2;
+  text-align: center;
+}
+
+.voice-box h3 {
+  color: #9f1239;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+.voice-record-btn {
+  background: linear-gradient(135deg,#fb7185,#e11d48);
+  color: white;
+  border: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.voice-record-btn.recording {
+  animation: recordPulse 1s infinite;
+}
+
+@keyframes recordPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.voice-status {
+  font-size: 0.8rem;
+  color: #9f1239;
+  margin: 10px;
+}
+
+.voice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.voice-item {
+  background: white;
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.voice-item span {
+  font-size: 0.85rem;
+  color: #881337;
+}
+
+.voice-item audio {
+  max-width: 150px;
+  height: 32px;
+}
+
+.location-box {
+  background: #eff6ff;
+}
+
+.location-box h3 {
+  color: #1e40af;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.location-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.location-input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid #bfdbfe;
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+
+.location-btn {
+  background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.location-remove-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.location-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location-item {
+  background: white;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.location-item-info {
+  text-align: right;
+}
+
+.location-item-name {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.location-item-label {
+  font-size: 0.8rem;
+  color: #2563eb;
+}
+
+.location-item-time {
+  font-size: 0.72rem;
+  color: #9ca3af;
+}
+
+.location-map-link {
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+.radar-box {
+  background: #f0fdf4;
+}
+
+.radar-box h3 {
+  color: #15803d;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+.radar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 9px 14px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+
+.radar-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.status-dot.online {
+  background: #22c55e;
+  animation: onlinePulse 1.6s infinite;
+}
+
+@keyframes onlinePulse {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
+.radar-name {
+  font-size: 0.92rem;
+  color: #166534;
+  font-weight: bold;
+}
+
+.radar-status {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.radar-status.online-text {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+.badges-box {
+  background: linear-gradient(135deg,#1e1b4b,#312e81);
+}
+
+.badges-box h3 {
+  color: #e0e7ff;
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+}
+
+.badge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.badge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.06);
+  padding: 10px 14px;
+  border-radius: 14px;
+}
+
+.badge-row.owner {
+  background: rgba(251,191,36,0.15);
+  border: 1.5px solid rgba(251,191,36,0.5);
+}
+
+.badge-icon-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-icon {
+  font-size: 1.8rem;
+}
+
+.badge-icon.diamond {
+  position: absolute;
+  font-size: 1rem;
+  top: -6px;
+  right: -6px;
+}
+
+.badge-info {
+  flex: 1;
+}
+
+.badge-name {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.badge-title {
+  font-size: 0.78rem;
+  color: #a5b4fc;
+}
+
+.poll-box {
+  background: #eef4ff;
+  text-align: right;
+}
+
+.poll-box h3 {
+  color: #1e40af;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.poll-option {
+  margin-bottom: 10px;
+}
+
+.poll-btn {
+  width: 100%;
+  background: white;
+  border: 2px solid #93c5fd;
+  color: #1e3a8a;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+.poll-btn.voted {
+  background: linear-gradient(135deg,#3b82f6,#1e40af);
+  color: white;
+}
+
+.poll-bar-wrap {
+  background: #e5e7eb;
+  border-radius: 8px;
+  height: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.poll-bar {
+  background: linear-gradient(90deg,#60a5fa,#2563eb);
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.poll-count {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 3px;
+}
+
+.news-box {
+  background: #f0fdf4;
+  text-align: right;
+}
+
+.news-box h3 {
+  color: #15803d;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.news-menu {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.news-tab {
+  background: white;
+  border: 1.5px solid #86efac;
+  color: #166534;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.news-tab.active {
+  background: linear-gradient(135deg,#22c55e,#15803d);
+  color: white;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.news-item {
+  display: block;
+  background: white;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #14532d;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.news-time {
+  display: block;
+  font-size: 0.72rem;
+  color: #999;
+  margin-top: 4px;
+}
+
+.news-loading {
+  text-align: center;
+  color: #888;
+  font-size: 0.85rem;
+  padding: 10px;
+}
+
+.visits-box {
+  background: #fef9c3;
+}
+
+.visits-box h3 {
+  color: #854d0e;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+
+.visit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.visit-row.me {
+  background: linear-gradient(135deg,#fbbf24,#f59e0b);
+  color: white;
+  font-weight: bold;
+}
+
+.visit-count-num {
+  background: #78350f;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
 </style>
 </head>
+
 <body>
-  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙</button>
-  <button class="profile-btn" onclick="openModal('profile-modal')">👤</button>
 
-  <!-- صفحه لودینگ -->
-  <div id="loading-screen">
-    <div class="loading-glow"></div>
-    <div class="loading-ring">
-      <div class="loading-icon">👋</div>
-    </div>
-    <div class="loading-text">در حال بارگذاری<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></div>
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙</button>
+<button class="profile-btn" onclick="openModal('profile-modal')">👤</button>
+
+<!-- لودینگ -->
+<div id="loading-screen">
+  <div class="loading-glow"></div>
+
+  <div class="loading-ring">
+    <div class="loading-icon">👋</div>
   </div>
 
-  <!-- صفحه شروع -->
-  <div id="start-screen">
-    <div class="start-emoji">👋🏠</div>
-    <div class="start-title">به اپ خانوادگی خوش آمدید!</div>
-    <div class="start-subtitle">گروه پسر خاله‌ها و خواهرها</div>
+  <div class="loading-text">
+    در حال بارگذاری
+    <span class="loading-dots">
+      <span>.</span>
+      <span>.</span>
+      <span>.</span>
+    </span>
+  </div>
+</div>
 
-    <div class="vpn-notice">
-      ⚠️ برای استفاده از بیشتر امکانات اپ (نظرسنجی، اخبار، پیام صوتی و ...) باید <b>وی‌پی‌ان روشن</b> باشه.
-      <br>قبل از شروع، اتصالت رو چک کن:
-    </div>
-    <button class="start-btn secondary vpn-check-btn" onclick="checkVpnConnection()">🔍 بررسی اتصال</button>
-    <div id="vpn-check-result"></div>
+<!-- صفحه شروع -->
+<div id="start-screen">
 
-    <div class="start-menu">
-      <button class="start-btn primary" onclick="startApp()">🚀 شروع</button>
-      <button class="start-btn secondary" onclick="openModal('settings-modal')">⚙️ تنظیمات</button>
-      <button class="start-btn secondary" onclick="openModal('about-modal')">ℹ️ درباره</button>
-      <button class="start-btn danger" onclick="endApp()">✖️ پایان دادن به اپ</button>
-    </div>
+  <div class="start-emoji">👋🏠</div>
+
+  <div class="start-title">
+    به اپ خانوادگی خوش آمدید!
   </div>
 
-  <!-- مودال پروفایل / دستگاه -->
-  <div class="modal-overlay" id="profile-modal">
-    <div class="modal-box">
-      <h3>👤 اطلاعات من</h3>
-      <div class="info-row"><span>اسم</span><span id="profile-name">-</span></div>
-      <div class="info-row"><span>سیستم عامل</span><span id="profile-os">-</span></div>
-      <div class="info-row"><span>مرورگر</span><span id="profile-browser">-</span></div>
-      <div class="info-row"><span>آی‌پی</span><span id="profile-ip">در حال دریافت...</span></div>
-      <button class="modal-close-btn" onclick="closeModal('profile-modal')">بستن</button>
-    </div>
+  <div class="start-subtitle">
+    گروه پسر خاله‌ها و خواهرها
   </div>
 
-  <!-- مودال تنظیمات -->
-  <div class="modal-overlay" id="settings-modal">
-    <div class="modal-box">
-      <h3>⚙️ تنظیمات</h3>
-      <p>حالت شب/روز رو از دکمه‌ی 🌙 بالای صفحه می‌تونی عوض کنی.</p>
-      <p>برای تغییر اسمت، برنامه رو دوباره باز کن و از لیست انتخاب کن.</p>
-      <button class="modal-close-btn" onclick="closeModal('settings-modal')">بستن</button>
-    </div>
+  <div class="vpn-notice">
+    ⚠️ برای استفاده از بیشتر امکانات اپ باید
+    <b>وی‌پی‌ان روشن</b> باشه.
+    <br>
+    قبل از شروع، اتصالت رو چک کن:
   </div>
 
-  <!-- مودال درباره -->
-  <div class="modal-overlay" id="about-modal">
-    <div class="modal-box">
-      <h3>ℹ️ درباره‌ی اپ</h3>
-      <p>این اپ خانوادگی توسط <b>امیر عباس</b> ساخته شده و مخصوص گروه پسر خاله‌ها و خواهرهاست 👑</p>
-      <p>نسخه: 1.0</p>
-      <button class="modal-close-btn" onclick="closeModal('about-modal')">بستن</button>
-    </div>
+  <button
+    class="start-btn secondary vpn-check-btn"
+    onclick="checkVpnConnection()">
+    🔍 بررسی اتصال
+  </button>
+
+  <div id="vpn-check-result"></div>
+
+  <div class="start-menu">
+
+    <button
+      class="start-btn primary"
+      onclick="startApp()">
+      🚀 شروع
+    </button>
+
+    <button
+      class="start-btn secondary"
+      onclick="openModal('settings-modal')">
+      ⚙️ تنظیمات
+    </button>
+
+    <button
+      class="start-btn secondary"
+      onclick="openModal('about-modal')">
+      ℹ️ درباره
+    </button>
+
+    <button
+      class="start-btn secondary"
+      onclick="window.location.href='ai.html'">
+      🤖 هوش مصنوعی
+    </button>
+
+    <button
+      class="start-btn danger"
+      onclick="endApp()">
+      ✖️ پایان دادن به اپ
+    </button>
+
   </div>
+</div>
 
-  <!-- صفحه پایان -->
-  <div id="end-screen">
-    <div class="emoji">👋</div>
-    <p>در حال بستن اپ...<br><span style="font-size:0.8rem;color:#9ca3af;">اگه بسته نشد، از دکمه‌ی بازگشت گوشیت یا Home استفاده کن</span></p>
+<!-- پروفایل -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal-box">
+
+    <h3>👤 اطلاعات من</h3>
+
+    <div class="info-row">
+      <span>اسم</span>
+      <span id="profile-name">-</span>
+    </div>
+
+    <div class="info-row">
+      <span>سیستم عامل</span>
+      <span id="profile-os">-</span>
+    </div>
+
+    <div class="info-row">
+      <span>مرورگر</span>
+      <span id="profile-browser">-</span>
+    </div>
+
+    <div class="info-row">
+      <span>آی‌پی</span>
+      <span id="profile-ip">در حال دریافت...</span>
+    </div>
+
+    <button
+      class="modal-close-btn"
+      onclick="closeModal('profile-modal')">
+      بستن
+    </button>
+
   </div>
+</div>
 
-  <!-- مودال خطای VPN -->
-  <div class="modal-overlay" id="vpn-error-modal">
-    <div class="modal-box">
-      <h3 style="color:#b91c1c;">⛔ خطا</h3>
-      <p>شما نمی‌توانید از آپ استفاده کنید، وی‌پی‌ان را بزنید و دوباره امتحان کنید.</p>
-      <p style="font-size:0.78rem; color:#9ca3af; direction:ltr;">Error VPN — Code: vpn_7223</p>
-      <button class="modal-close-btn" onclick="closeModal('vpn-error-modal')">باشه</button>
-    </div>
-  </div>
+<!-- تنظیمات -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal-box">
 
-  <div class="card" id="main-card" style="display:none;">
-    <div class="emoji">🎉👋</div>
-    <h1>سلام!</h1>
-    <h2>به آپ گروه پسر خاله‌ها و خواهرها خوش آمدید!</h2>
+    <h3>⚙️ تنظیمات</h3>
 
-    <div class="divider"></div>
-
-    <div class="members">
-      <h3>👥 اعضای گروه</h3>
-      <div class="member-list">
-        <span class="member-tag">امیر عباس</span>
-        <span class="member-tag">ساشا</span>
-        <span class="member-tag">ساناز</span>
-        <span class="member-tag">پاشا</span>
-        <span class="member-tag">طاها</span>
-        <span class="member-tag">الناز</span>
-      </div>
-    </div>
-
-    <div class="birthday-box" id="birthday-box">
-      <h3>🎂 امروز تولد کیه؟</h3>
-      <div class="bname" id="birthday-name"></div>
-    </div>
-
-    <div class="owner">👑 امیر عباس مالک است</div>
-
-    <div class="divider"></div>
-
-    <div class="prices">
-      <h3>💰 قیمت لحظه‌ای ارز و کریپتو</h3>
-      <div class="price-grid">
-        <a href="https://www.tgju.org/profile/price_dollar_rl" target="_blank" class="price-tag">💵 دلار</a>
-        <a href="https://www.tgju.org/profile/crypto-tether" target="_blank" class="price-tag">🪙 تتر</a>
-        <a href="https://www.tgju.org/profile/price_eur" target="_blank" class="price-tag">💶 یورو</a>
-        <a href="https://www.tgju.org/profile/crypto-bitcoin" target="_blank" class="price-tag">₿ بیت‌کوین</a>
-      </div>
-      <p class="price-note">با لمس هر کدوم، قیمت لحظه‌ای و زنده‌ش باز میشه</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="poll-box">
-      <h3>🗳️ بهترین آشپز خانواده کیه؟</h3>
-      <p style="font-size:0.8rem; color:#b91c1c; text-align:center; margin-bottom:10px;">
-        ⚠️ برای دیدن و ثبت نظرسنجی، وی‌پی‌ان رو روشن کنید
-      </p>
-      <div id="poll-options"></div>
-      <p class="poll-count" id="poll-total" style="text-align:center; margin-top:10px;"></p>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="news-box">
-      <h3>⚽ اخبار ورزشی لحظه‌ای</h3>
-      <div class="news-menu">
-        <button class="news-tab active" data-feed="all">🏆 همه</button>
-        <button class="news-tab" data-feed="domesticFootball">🇮🇷 فوتبال داخلی</button>
-        <button class="news-tab" data-feed="foreignFootball">🌍 فوتبال خارجی</button>
-        <button class="news-tab" data-feed="otherSports">🏀 سایر ورزش‌ها</button>
-      </div>
-      <div class="news-list" id="news-list">
-        <div class="news-loading">در حال دریافت اخبار...</div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="visits-box">
-      <h3>📊 کی بیشتر اپ رو باز کرده؟</h3>
-      <div id="visits-list"></div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="radar-box">
-      <h3>🟢 رادار خانواده</h3>
-      <div id="radar-list"></div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="location-box">
-      <h3>📍 من الان اینجام</h3>
-      <div class="location-input-row">
-        <input type="text" class="location-input" id="location-label-input" placeholder="مثلاً: خرید، خونه، سرکار">
-        <button class="location-btn" onclick="shareMyLocation()">اشتراک</button>
-      </div>
-      <button class="location-remove-btn" onclick="removeMyLocation()">🗑️ حذف موقعیت من</button>
-      <div class="location-list" id="location-list"></div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="badges-box">
-      <h3>🏅 نشان‌های خانواده</h3>
-      <div class="badge-list" id="badge-list"></div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="quote-box" id="quote-box">
-      <h3>✨ حرف قشنگ امروز</h3>
-      <p id="quote-text"></p>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="vibe-box">
-      <h3>📳 پیام لرزون بفرست</h3>
-      <p style="font-size:0.75rem; color:#0e7490; margin-bottom:10px;">
-        بعضی از گوشی‌ها این قابلیت را ندارند، اگر ویبره نزد تقصیر ما نیست
-      </p>
-      <div class="vibe-grid">
-        <button class="vibe-btn" onclick="sendVibe('heart')">💓 ضربان قلب</button>
-        <button class="vibe-btn" onclick="sendVibe('sos')">🆘 اس‌اُاس</button>
-        <button class="vibe-btn" onclick="sendVibe('laugh')">😂 خنده‌دار</button>
-        <button class="vibe-btn" onclick="sendVibe('knock')">🚪 در زدن</button>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="wake-box">
-      <h3>💡 حالت بیدار</h3>
-      <p>صفحه گوشیت خاموش نشه تا وقتی اپ بازه</p>
-      <button class="wake-toggle-btn" id="wake-btn" onclick="toggleWakeLock()">فعال کردن</button>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="voice-box">
-      <h3>🎙️ پیام صوتی کوتاه</h3>
-      <button class="voice-record-btn" id="voice-record-btn" onclick="toggleRecording()">🎤</button>
-      <div class="voice-status" id="voice-status">برای ضبط ۵ ثانیه‌ای لمس کن</div>
-      <div class="voice-list" id="voice-list"></div>
-    </div>
-
-    <div class="robot">🤖✨</div>
-    <p class="tagline">
-      ربات‌های فوق پیشرفته و خفن‌ترین گروه خانوادگیمون<br>و ...
+    <p>
+      حالت شب/روز رو از دکمه‌ی 🌙 بالای صفحه می‌تونی عوض کنی.
     </p>
 
-    <div class="divider"></div>
-    <p class="footer-note">📱 آپ تستی (هم برای اندروید و ای یو اس)</p>
+    <p>
+      برای تغییر اسمت، برنامه رو دوباره باز کن و از لیست انتخاب کن.
+    </p>
+
+    <button
+      class="modal-close-btn"
+      onclick="closeModal('settings-modal')">
+      بستن
+    </button>
+
+  </div>
+</div>
+
+<!-- درباره -->
+<div class="modal-overlay" id="about-modal">
+  <div class="modal-box">
+
+    <h3>ℹ️ درباره‌ی اپ</h3>
+
+    <p>
+      این اپ خانوادگی توسط
+      <b>امیر عباس</b>
+      ساخته شده و مخصوص گروه پسر خاله‌ها و خواهرهاست 👑
+    </p>
+
+    <p>
+      نسخه: 1.1
+    </p>
+
+    <button
+      class="modal-close-btn"
+      onclick="closeModal('about-modal')">
+      بستن
+    </button>
+
+  </div>
+</div>
+
+<!-- پایان -->
+<div id="end-screen">
+  <div class="emoji">👋</div>
+
+  <p>
+    در حال بستن اپ...
+    <br>
+    <span style="font-size:0.8rem;color:#9ca3af;">
+      اگه بسته نشد، از دکمه‌ی بازگشت گوشیت یا Home استفاده کن
+    </span>
+  </p>
+</div>
+
+<!-- خطای VPN -->
+<div class="modal-overlay" id="vpn-error-modal">
+  <div class="modal-box">
+
+    <h3 style="color:#b91c1c;">
+      ⛔ خطا
+    </h3>
+
+    <p>
+      شما نمی‌توانید از آپ استفاده کنید،
+      وی‌پی‌ان را بزنید و دوباره امتحان کنید.
+    </p>
+
+    <p style="font-size:0.78rem;color:#9ca3af;direction:ltr;">
+      Error VPN — Code: vpn_7223
+    </p>
+
+    <button
+      class="modal-close-btn"
+      onclick="closeModal('vpn-error-modal')">
+      باشه
+    </button>
+
+  </div>
+</div>
+
+<!-- محتوای اصلی -->
+<div class="card" id="main-card" style="display:none;">
+
+  <div class="emoji">🎉👋</div>
+
+  <h1>سلام!</h1>
+
+  <h2>
+    به آپ گروه پسر خاله‌ها و خواهرها خوش آمدید!
+  </h2>
+
+  <div class="divider"></div>
+
+  <div class="members">
+
+    <h3>👥 اعضای گروه</h3>
+
+    <div class="member-list">
+      <span class="member-tag">امیر عباس</span>
+      <span class="member-tag">ساشا</span>
+      <span class="member-tag">ساناز</span>
+      <span class="member-tag">پاشا</span>
+      <span class="member-tag">طاها</span>
+      <span class="member-tag">الناز</span>
+    </div>
+
   </div>
 
-  <script>
-    // مخفی کردن صفحه لودینگ بعد از آماده شدن صفحه
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        document.getElementById('loading-screen').classList.add('hidden');
-      }, 1400);
+  <div class="birthday-box" id="birthday-box">
+
+    <h3>🎂 امروز تولد کیه؟</h3>
+
+    <div
+      class="bname"
+      id="birthday-name">
+    </div>
+
+  </div>
+
+  <div class="owner">
+    👑 امیر عباس مالک است
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="prices">
+
+    <h3>
+      💰 قیمت لحظه‌ای ارز و کریپتو
+    </h3>
+
+    <div class="price-grid">
+
+      <a
+        href="https://www.tgju.org/profile/price_dollar_rl"
+        target="_blank"
+        class="price-tag">
+        💵 دلار
+      </a>
+
+      <a
+        href="https://www.tgju.org/profile/crypto-tether"
+        target="_blank"
+        class="price-tag">
+        🪙 تتر
+      </a>
+
+      <a
+        href="https://www.tgju.org/profile/price_eur"
+        target="_blank"
+        class="price-tag">
+        💶 یورو
+      </a>
+
+      <a
+        href="https://www.tgju.org/profile/crypto-bitcoin"
+        target="_blank"
+        class="price-tag">
+        ₿ بیت‌کوین
+      </a>
+
+    </div>
+
+    <p class="price-note">
+      با لمس هر کدوم، قیمت لحظه‌ای و زنده‌ش باز میشه
+    </p>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="poll-box">
+
+    <h3>
+      🗳️ بهترین آشپز خانواده کیه؟
+    </h3>
+
+    <p style="font-size:0.8rem;color:#b91c1c;text-align:center;margin-bottom:10px;">
+      ⚠️ برای دیدن و ثبت نظرسنجی، وی‌پی‌ان رو روشن کنید
+    </p>
+
+    <div id="poll-options"></div>
+
+    <p
+      class="poll-count"
+      id="poll-total"
+      style="text-align:center;margin-top:10px;">
+    </p>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="news-box">
+
+    <h3>⚽ اخبار ورزشی لحظه‌ای</h3>
+
+    <div class="news-menu">
+
+      <button class="news-tab active" data-feed="all">
+        🏆 همه
+      </button>
+
+      <button class="news-tab" data-feed="domesticFootball">
+        🇮🇷 فوتبال داخلی
+      </button>
+
+      <button class="news-tab" data-feed="foreignFootball">
+        🌍 فوتبال خارجی
+      </button>
+
+      <button class="news-tab" data-feed="otherSports">
+        🏀 سایر ورزش‌ها
+      </button>
+
+    </div>
+
+    <div class="news-list" id="news-list">
+      <div class="news-loading">
+        در حال دریافت اخبار...
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="visits-box">
+
+    <h3>
+      📊 کی بیشتر اپ رو باز کرده؟
+    </h3>
+
+    <div id="visits-list"></div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="radar-box">
+
+    <h3>🟢 رادار خانواده</h3>
+
+    <div id="radar-list"></div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="location-box">
+
+    <h3>📍 من الان اینجام</h3>
+
+    <div class="location-input-row">
+
+      <input
+        type="text"
+        class="location-input"
+        id="location-label-input"
+        placeholder="مثلاً: خرید، خونه، سرکار">
+
+      <button
+        class="location-btn"
+        onclick="shareMyLocation()">
+        اشتراک
+      </button>
+
+    </div>
+
+    <button
+      class="location-remove-btn"
+      onclick="removeMyLocation()">
+      🗑️ حذف موقعیت من
+    </button>
+
+    <div
+      class="location-list"
+      id="location-list">
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="badges-box">
+
+    <h3>🏅 نشان‌های خانواده</h3>
+
+    <div
+      class="badge-list"
+      id="badge-list">
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="quote-box">
+
+    <h3>✨ حرف قشنگ امروز</h3>
+
+    <p id="quote-text"></p>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="vibe-box">
+
+    <h3>📳 پیام لرزون بفرست</h3>
+
+    <p style="font-size:0.75rem;color:#0e7490;margin-bottom:10px;">
+      بعضی از گوشی‌ها این قابلیت را ندارند،
+      اگر ویبره نزد تقصیر ما نیست
+    </p>
+
+    <div class="vibe-grid">
+
+      <button
+        class="vibe-btn"
+        onclick="sendVibe('heart')">
+        💓 ضربان قلب
+      </button>
+
+      <button
+        class="vibe-btn"
+        onclick="sendVibe('sos')">
+        🆘 اس‌اُاس
+      </button>
+
+      <button
+        class="vibe-btn"
+        onclick="sendVibe('laugh')">
+        😂 خنده‌دار
+      </button>
+
+      <button
+        class="vibe-btn"
+        onclick="sendVibe('knock')">
+        🚪 در زدن
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="wake-box">
+
+    <h3>💡 حالت بیدار</h3>
+
+    <p>
+      صفحه گوشیت خاموش نشه تا وقتی اپ بازه
+    </p>
+
+    <button
+      class="wake-toggle-btn"
+      id="wake-btn"
+      onclick="toggleWakeLock()">
+      فعال کردن
+    </button>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="voice-box">
+
+    <h3>🎙️ پیام صوتی کوتاه</h3>
+
+    <button
+      class="voice-record-btn"
+      id="voice-record-btn"
+      onclick="toggleRecording()">
+      🎤
+    </button>
+
+    <div
+      class="voice-status"
+      id="voice-status">
+      برای ضبط ۵ ثانیه‌ای لمس کن
+    </div>
+
+    <div
+      class="voice-list"
+      id="voice-list">
+    </div>
+
+  </div>
+
+  <div class="robot">
+    🤖✨
+  </div>
+
+  <p class="tagline">
+    ربات‌های فوق پیشرفته و خفن‌ترین گروه خانوادگیمون
+    <br>
+    و ...
+  </p>
+
+  <div class="divider"></div>
+
+  <p class="footer-note">
+    📱 آپ تستی (هم برای اندروید و ای یو اس)
+  </p>
+
+</div>
+
+<script>
+
+/* =====================================================
+   سیستم ضد گیر کردن لودینگ
+   ===================================================== */
+
+(function () {
+
+  let loadingClosed = false;
+
+  function hideLoading() {
+
+    if (loadingClosed) return;
+
+    loadingClosed = true;
+
+    const loading = document.getElementById("loading-screen");
+
+    if (!loading) return;
+
+    loading.classList.add("hidden");
+
+    setTimeout(function () {
+      loading.style.display = "none";
+    }, 800);
+
+  }
+
+  /*
+    لودینگ دیگر به اینترنت، Firebase،
+    اخبار یا هیچ سرویس دیگری وابسته نیست.
+  */
+
+  if (document.readyState === "loading") {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+        setTimeout(hideLoading, 300);
+      },
+      { once: true }
+    );
+
+  } else {
+
+    setTimeout(hideLoading, 300);
+
+  }
+
+  window.addEventListener(
+    "load",
+    function () {
+      setTimeout(hideLoading, 300);
+    },
+    { once: true }
+  );
+
+  /*
+    سیستم نجات:
+    حتی اگر هر چیزی در صفحه مشکل داشته باشد،
+    لودینگ بیشتر از ۵ ثانیه نمی‌ماند.
+  */
+
+  setTimeout(hideLoading, 5000);
+
+})();
+
+
+/* =====================================================
+   جرقه‌های لودینگ
+   ===================================================== */
+
+(function createLoadingSparks() {
+
+  const loadingScreen =
+    document.getElementById("loading-screen");
+
+  if (!loadingScreen) return;
+
+  for (let i = 0; i < 14; i++) {
+
+    const spark =
+      document.createElement("div");
+
+    spark.className = "loading-spark";
+
+    spark.style.left =
+      (35 + Math.random() * 30) + "%";
+
+    spark.style.top =
+      (55 + Math.random() * 20) + "%";
+
+    spark.style.animationDuration =
+      (1.5 + Math.random() * 1.5) + "s";
+
+    spark.style.animationDelay =
+      (Math.random() * 2) + "s";
+
+    loadingScreen.appendChild(spark);
+
+  }
+
+})();
+
+
+/* =====================================================
+   ذرات پس‌زمینه
+   ===================================================== */
+
+function createParticles() {
+
+  for (let i = 0; i < 18; i++) {
+
+    const p =
+      document.createElement("div");
+
+    p.className = "particle";
+
+    const size =
+      Math.random() * 14 + 6;
+
+    p.style.width = size + "px";
+    p.style.height = size + "px";
+    p.style.left = Math.random() * 100 + "vw";
+
+    p.style.animationDuration =
+      (Math.random() * 10 + 8) + "s";
+
+    p.style.animationDelay =
+      (Math.random() * 8) + "s";
+
+    document.body.appendChild(p);
+
+  }
+
+}
+
+createParticles();
+
+
+/* =====================================================
+   تولدها
+   ===================================================== */
+
+const birthdays = [
+  { name: "امیر عباس", month: 8, day: 2 },
+  { name: "ساشا", month: 10, day: 14 },
+  { name: "ساناز", month: 7, day: 25 },
+  { name: "پاشا", month: 6, day: 1 },
+  { name: "طاها", month: 2, day: 15 },
+  { name: "الناز", month: 12, day: 6 }
+];
+
+function getJalaliMonthDay() {
+
+  try {
+
+    const formatter =
+      new Intl.DateTimeFormat(
+        "fa-IR-u-ca-persian",
+        {
+          month: "numeric",
+          day: "numeric"
+        }
+      );
+
+    const parts =
+      formatter.formatToParts(new Date());
+
+    let month;
+    let day;
+
+    parts.forEach(function (p) {
+
+      if (p.type === "month") {
+        month = parseInt(p.value);
+      }
+
+      if (p.type === "day") {
+        day = parseInt(p.value);
+      }
+
     });
 
-    // ساخت جرقه‌های نورانی توی صفحه لودینگ
-    (function createLoadingSparks() {
-      const loadingScreen = document.getElementById('loading-screen');
-      for (let i = 0; i < 14; i++) {
-        const spark = document.createElement('div');
-        spark.className = 'loading-spark';
-        spark.style.left = (35 + Math.random() * 30) + '%';
-        spark.style.top = (55 + Math.random() * 20) + '%';
-        spark.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
-        spark.style.animationDelay = (Math.random() * 2) + 's';
-        loadingScreen.appendChild(spark);
-      }
-    })();
+    return { month, day };
 
-    // ساخت ذرات شناور در پس‌زمینه
-    function createParticles() {
-      const count = 18;
-      for (let i = 0; i < count; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 14 + 6;
-        p.style.width = size + 'px';
-        p.style.height = size + 'px';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.animationDuration = (Math.random() * 10 + 8) + 's';
-        p.style.animationDelay = (Math.random() * 8) + 's';
-        document.body.appendChild(p);
-      }
-    }
-    createParticles();
+  } catch (e) {
 
-    // بررسی تولد امروز (تقویم شمسی)
-    const birthdays = [
-      { name: "امیر عباس", month: 8, day: 2 },   // ۲ آبان
-      { name: "ساشا",      month: 10, day: 14 }, // ۱۴ دی
-      { name: "ساناز",     month: 7, day: 25 },  // ۲۵ مهر
-      { name: "پاشا",      month: 6, day: 1 },   // ۱ شهریور
-      { name: "طاها",      month: 2, day: 15 },  // ۱۵ اردیبهشت
-      { name: "الناز",     month: 12, day: 6 }   // ۶ اسفند
-    ];
-
-    function getJalaliMonthDay() {
-      const formatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { month: 'numeric', day: 'numeric' });
-      const parts = formatter.formatToParts(new Date());
-      let month, day;
-      parts.forEach(p => {
-        if (p.type === 'month') month = parseInt(p.value);
-        if (p.type === 'day') day = parseInt(p.value);
-      });
-      return { month, day };
-    }
-
-    function checkBirthdays() {
-      const today = getJalaliMonthDay();
-      const todaysPeople = birthdays.filter(b => b.month === today.month && b.day === today.day);
-      if (todaysPeople.length > 0) {
-        document.getElementById('birthday-name').textContent =
-          todaysPeople.map(p => p.name).join('، ') + ' 🎉🎂';
-        document.getElementById('birthday-box').classList.add('show');
-      }
-    }
-    checkBirthdays();
-
-    // ---------- رای‌گیری واقعی با Firebase Realtime Database ----------
-    const FIREBASE_URL = "https://app-khanevadeh-bc38f-default-rtdb.firebaseio.com";
-    const pollOptions = ["امیر عباس", "ساشا", "ساناز", "پاشا", "طاها", "الناز"];
-    const VOTED_KEY = "khanevadeh_voted_option";
-
-    async function loadPoll() {
-      try {
-        const res = await fetch(FIREBASE_URL + "/poll/votes.json");
-        const data = await res.json() || {};
-        renderPoll(data);
-      } catch (e) {
-        console.error("خطا در دریافت رای‌ها", e);
-      }
-    }
-
-    function renderPoll(votes) {
-      const container = document.getElementById("poll-options");
-      container.innerHTML = "";
-      const total = pollOptions.reduce((sum, opt) => sum + (votes[opt] || 0), 0);
-      const myVote = localStorage.getItem(VOTED_KEY);
-
-      pollOptions.forEach(opt => {
-        const count = votes[opt] || 0;
-        const percent = total > 0 ? Math.round((count / total) * 100) : 0;
-        const wrapper = document.createElement("div");
-        wrapper.className = "poll-option";
-
-        const btn = document.createElement("button");
-        btn.className = "poll-btn" + (myVote === opt ? " voted" : "");
-        btn.innerHTML = `<span>${opt}</span><span>${percent}%</span>`;
-        btn.onclick = () => vote(opt);
-
-        const barWrap = document.createElement("div");
-        barWrap.className = "poll-bar-wrap";
-        const bar = document.createElement("div");
-        bar.className = "poll-bar";
-        bar.style.width = percent + "%";
-        barWrap.appendChild(bar);
-
-        const countText = document.createElement("div");
-        countText.className = "poll-count";
-        countText.textContent = count + " رای";
-
-        wrapper.appendChild(btn);
-        wrapper.appendChild(barWrap);
-        wrapper.appendChild(countText);
-        container.appendChild(wrapper);
-      });
-
-      document.getElementById("poll-total").textContent = "مجموع آرا: " + total;
-    }
-
-    async function vote(option) {
-      const prevVote = localStorage.getItem(VOTED_KEY);
-      if (prevVote === option) return; // قبلا به همین گزینه رای داده
-
-      try {
-        const res = await fetch(FIREBASE_URL + "/poll/votes.json");
-        const data = await res.json() || {};
-
-        // اگه قبلا به گزینه دیگه رای داده بود، اون رو کم کن
-        if (prevVote && data[prevVote]) {
-          data[prevVote] = Math.max(0, data[prevVote] - 1);
-        }
-        data[option] = (data[option] || 0) + 1;
-
-        await fetch(FIREBASE_URL + "/poll/votes.json", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        localStorage.setItem(VOTED_KEY, option);
-        renderPoll(data);
-      } catch (e) {
-        console.error("خطا در ثبت رای", e);
-      }
-    }
-
-    loadPoll();
-
-    // ---------- اخبار ورزشی لحظه‌ای (از ورزش۳) ----------
-    const newsFeeds = {
-      all: 'http://www.varzesh3.com/rss/all',
-      domesticFootball: 'http://www.varzesh3.com/rss/domesticFootball',
-      foreignFootball: 'http://www.varzesh3.com/rss/foreignFootball',
-      otherSports: 'http://www.varzesh3.com/rss/otherSports'
+    return {
+      month: 0,
+      day: 0
     };
 
-    async function loadNews(feedKey) {
-      const listEl = document.getElementById('news-list');
-      listEl.innerHTML = '<div class="news-loading">در حال دریافت اخبار...</div>';
-      try {
-        const rssUrl = newsFeeds[feedKey];
-        const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
-        const res = await fetch(apiUrl);
-        const data = await res.json();
+  }
 
-        if (data.status !== 'ok' || !data.items || data.items.length === 0) {
-          listEl.innerHTML = '<div class="news-loading">خبری پیدا نشد</div>';
-          return;
-        }
+}
 
-        listEl.innerHTML = '';
-        data.items.slice(0, 12).forEach(item => {
-          const a = document.createElement('a');
-          a.className = 'news-item';
-          a.href = item.link;
-          a.target = '_blank';
-          const date = new Date(item.pubDate);
-          const timeStr = date.toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
-          a.innerHTML = item.title + '<span class="news-time">🕒 ' + timeStr + '</span>';
-          listEl.appendChild(a);
-        });
-      } catch (e) {
-        listEl.innerHTML = '<div class="news-loading">دریافت اخبار ناموفق بود، دوباره امتحان کنید</div>';
-      }
-    }
+function checkBirthdays() {
 
-    document.querySelectorAll('.news-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.news-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        loadNews(tab.dataset.feed);
-      });
+  const today =
+    getJalaliMonthDay();
+
+  const people =
+    birthdays.filter(function (b) {
+
+      return (
+        b.month === today.month &&
+        b.day === today.day
+      );
+
     });
 
-    loadNews('all');
-    setInterval(() => {
-      const activeTab = document.querySelector('.news-tab.active');
-      loadNews(activeTab.dataset.feed);
-    }, 120000); // هر ۲ دقیقه بروزرسانی میشه
+  if (people.length) {
 
-    // ---------- تم شب/روز ----------
-    function toggleTheme() {
-      const isDark = document.body.classList.toggle('dark-mode');
-      document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
-      localStorage.setItem('khanevadeh_theme', isDark ? 'dark' : 'light');
-      playClickSound();
+    document.getElementById(
+      "birthday-name"
+    ).textContent =
+      people.map(p => p.name).join("، ") +
+      " 🎉🎂";
+
+    document.getElementById(
+      "birthday-box"
+    ).classList.add("show");
+
+  }
+
+}
+
+checkBirthdays();
+
+
+/* =====================================================
+   Firebase
+   ===================================================== */
+
+const FIREBASE_URL =
+  "https://app-khanevadeh-bc38f-default-rtdb.firebaseio.com";
+
+const familyMembers = [
+  "امیر عباس",
+  "ساشا",
+  "ساناز",
+  "پاشا",
+  "طاها",
+  "الناز"
+];
+
+
+/* =====================================================
+   نظرسنجی
+   ===================================================== */
+
+const pollOptions = [
+  "امیر عباس",
+  "ساشا",
+  "ساناز",
+  "پاشا",
+  "طاها",
+  "الناز"
+];
+
+const VOTED_KEY =
+  "khanevadeh_voted_option";
+
+async function loadPoll() {
+
+  try {
+
+    const res =
+      await fetch(
+        FIREBASE_URL +
+        "/poll/votes.json"
+      );
+
+    const data =
+      await res.json() || {};
+
+    renderPoll(data);
+
+  } catch (e) {
+
+    console.error(
+      "خطا در دریافت رای‌ها",
+      e
+    );
+
+  }
+
+}
+
+function renderPoll(votes) {
+
+  const container =
+    document.getElementById(
+      "poll-options"
+    );
+
+  container.innerHTML = "";
+
+  const total =
+    pollOptions.reduce(
+      (sum, opt) =>
+        sum + (votes[opt] || 0),
+      0
+    );
+
+  const myVote =
+    localStorage.getItem(
+      VOTED_KEY
+    );
+
+  pollOptions.forEach(function (opt) {
+
+    const count =
+      votes[opt] || 0;
+
+    const percent =
+      total > 0
+        ? Math.round(
+            count / total * 100
+          )
+        : 0;
+
+    const wrapper =
+      document.createElement("div");
+
+    wrapper.className =
+      "poll-option";
+
+    const btn =
+      document.createElement("button");
+
+    btn.className =
+      "poll-btn" +
+      (myVote === opt
+        ? " voted"
+        : "");
+
+    btn.innerHTML =
+      "<span>" +
+      opt +
+      "</span><span>" +
+      percent +
+      "%</span>";
+
+    btn.onclick =
+      function () {
+        vote(opt);
+      };
+
+    const barWrap =
+      document.createElement("div");
+
+    barWrap.className =
+      "poll-bar-wrap";
+
+    const bar =
+      document.createElement("div");
+
+    bar.className =
+      "poll-bar";
+
+    bar.style.width =
+      percent + "%";
+
+    barWrap.appendChild(bar);
+
+    const countText =
+      document.createElement("div");
+
+    countText.className =
+      "poll-count";
+
+    countText.textContent =
+      count + " رای";
+
+    wrapper.appendChild(btn);
+    wrapper.appendChild(barWrap);
+    wrapper.appendChild(countText);
+
+    container.appendChild(wrapper);
+
+  });
+
+  document.getElementById(
+    "poll-total"
+  ).textContent =
+    "مجموع آرا: " + total;
+
+}
+
+async function vote(option) {
+
+  const previous =
+    localStorage.getItem(
+      VOTED_KEY
+    );
+
+  if (previous === option) return;
+
+  try {
+
+    const res =
+      await fetch(
+        FIREBASE_URL +
+        "/poll/votes.json"
+      );
+
+    const data =
+      await res.json() || {};
+
+    if (
+      previous &&
+      data[previous]
+    ) {
+
+      data[previous] =
+        Math.max(
+          0,
+          data[previous] - 1
+        );
+
     }
-    if (localStorage.getItem('khanevadeh_theme') === 'dark') {
-      document.body.classList.add('dark-mode');
-      document.getElementById('theme-toggle').textContent = '☀️';
-    }
 
-    // ---------- صدای کلیک روی دکمه‌ها ----------
-    let audioCtx;
-    function playClickSound() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(720, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(340, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
-      } catch (e) { /* مرورگر پشتیبانی نمی‌کنه */ }
-    }
-    document.querySelectorAll('button, .poll-btn, .news-tab, a.news-item, a.price-tag')
-      .forEach(el => el.addEventListener('click', playClickSound));
+    data[option] =
+      (data[option] || 0) + 1;
 
-    // ---------- شمارنده بازدید هر عضو ----------
-    const familyMembers = ["امیر عباس", "ساشا", "ساناز", "پاشا", "طاها", "الناز"];
-    const ME_KEY = "khanevadeh_my_name";
-
-    // ---------- نشان‌های خانواده ----------
-    const memberBadges = {
-      "امیر عباس": { icon: "👑", title: "مالک", owner: true },
-      "ساشا": { icon: "🦁", title: "عضو خانواده" },
-      "ساناز": { icon: "🌸", title: "عضو خانواده" },
-      "پاشا": { icon: "⚡", title: "عضو خانواده" },
-      "طاها": { icon: "🎯", title: "عضو خانواده" },
-      "الناز": { icon: "🌟", title: "عضو خانواده" }
-    };
-    function renderBadges() {
-      const container = document.getElementById('badge-list');
-      container.innerHTML = '';
-      familyMembers.forEach(name => {
-        const badge = memberBadges[name];
-        const row = document.createElement('div');
-        row.className = 'badge-row' + (badge.owner ? ' owner' : '');
-        row.innerHTML = `
-          <div class="badge-icon-wrap">
-            ${badge.owner ? '<div class="badge-glow"></div>' : ''}
-            <span class="badge-icon${badge.owner ? ' crown' : ''}">${badge.icon}</span>
-            ${badge.owner ? '<span class="badge-icon diamond">💎</span>' : ''}
-          </div>
-          <div class="badge-info">
-            <div class="badge-name">${name}</div>
-            <div class="badge-title">${badge.title}</div>
-          </div>`;
-        container.appendChild(row);
-      });
-    }
-    renderBadges();
-
-    function askMyName() {
-      let name = localStorage.getItem(ME_KEY);
-      if (!name) {
-        const list = familyMembers.map((n, i) => (i + 1) + ". " + n).join("\n");
-        let answer = prompt("اسمت چیه؟ عدد مربوطه رو بنویس:\n" + list);
-        const idx = parseInt(answer) - 1;
-        name = familyMembers[idx] || null;
-        if (name) localStorage.setItem(ME_KEY, name);
+    await fetch(
+      FIREBASE_URL +
+      "/poll/votes.json",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body:
+          JSON.stringify(data)
       }
-      return name;
+    );
+
+    localStorage.setItem(
+      VOTED_KEY,
+      option
+    );
+
+    renderPoll(data);
+
+  } catch (e) {
+
+    console.error(
+      "خطا در ثبت رای",
+      e
+    );
+
+  }
+
+}
+
+loadPoll();
+
+
+/* =====================================================
+   اخبار
+   ===================================================== */
+
+const newsFeeds = {
+
+  all:
+    "https://www.varzesh3.com/rss/all",
+
+  domesticFootball:
+    "https://www.varzesh3.com/rss/domesticFootball",
+
+  foreignFootball:
+    "https://www.varzesh3.com/rss/foreignFootball",
+
+  otherSports:
+    "https://www.varzesh3.com/rss/otherSports"
+
+};
+
+async function loadNews(feedKey) {
+
+  const listEl =
+    document.getElementById(
+      "news-list"
+    );
+
+  listEl.innerHTML =
+    '<div class="news-loading">' +
+    "در حال دریافت اخبار..." +
+    "</div>";
+
+  try {
+
+    const rssUrl =
+      newsFeeds[feedKey];
+
+    const apiUrl =
+      "https://api.rss2json.com/v1/api.json?rss_url=" +
+      encodeURIComponent(rssUrl);
+
+    const res =
+      await fetch(apiUrl);
+
+    const data =
+      await res.json();
+
+    if (
+      data.status !== "ok" ||
+      !data.items ||
+      !data.items.length
+    ) {
+
+      listEl.innerHTML =
+        '<div class="news-loading">' +
+        "خبری پیدا نشد" +
+        "</div>";
+
+      return;
+
     }
 
-    async function trackVisit() {
-      const myName = askMyName();
-      if (!myName) return renderVisits({});
+    listEl.innerHTML = "";
 
-      try {
-        const res = await fetch(FIREBASE_URL + "/visits.json");
-        const data = await res.json() || {};
-        data[myName] = (data[myName] || 0) + 1;
-        await fetch(FIREBASE_URL + "/visits.json", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        renderVisits(data);
-      } catch (e) {
-        console.error("خطا در ثبت بازدید", e);
-      }
-    }
+    data.items
+      .slice(0, 12)
+      .forEach(function (item) {
 
-    function renderVisits(data) {
-      const myName = localStorage.getItem(ME_KEY);
-      const sorted = familyMembers
-        .map(name => ({ name, count: data[name] || 0 }))
-        .sort((a, b) => b.count - a.count);
+        const a =
+          document.createElement("a");
 
-      const container = document.getElementById('visits-list');
-      container.innerHTML = '';
-      sorted.forEach(person => {
-        const row = document.createElement('div');
-        row.className = 'visit-row' + (person.name === myName ? ' me' : '');
-        row.innerHTML = `<span>${person.name}</span><span class="visit-count-num">${person.count} بار</span>`;
-        container.appendChild(row);
-      });
-    }
+        a.className =
+          "news-item";
 
-    trackVisit();
+        a.href = item.link;
+        a.target = "_blank";
 
-    // ---------- رادار زنده خانواده (Presence) ----------
-    function relativeTimeFa(diffMs) {
-      const sec = Math.floor(diffMs / 1000);
-      if (sec < 60) return "چند ثانیه پیش";
-      const min = Math.floor(sec / 60);
-      if (min < 60) return min + " دقیقه پیش";
-      const hr = Math.floor(min / 60);
-      if (hr < 24) return hr + " ساعت پیش";
-      const day = Math.floor(hr / 24);
-      return day + " روز پیش";
-    }
+        const date =
+          new Date(item.pubDate);
 
-    async function sendPresence() {
-      const myName = localStorage.getItem(ME_KEY);
-      if (!myName) return;
-      try {
-        await fetch(FIREBASE_URL + "/presence/" + encodeURIComponent(myName) + ".json", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(Date.now())
-        });
-      } catch (e) {
-        console.error("خطا در ارسال حضور", e);
-      }
-    }
-
-    async function loadPresence() {
-      try {
-        const res = await fetch(FIREBASE_URL + "/presence.json");
-        const data = await res.json() || {};
-        const now = Date.now();
-        const container = document.getElementById('radar-list');
-        container.innerHTML = '';
-
-        familyMembers.forEach(name => {
-          const lastSeen = data[name];
-          const isOnline = lastSeen && (now - lastSeen < 20000);
-          const row = document.createElement('div');
-          row.className = 'radar-row';
-          const statusText = isOnline
-            ? '🟢 آنلاینه'
-            : (lastSeen ? relativeTimeFa(now - lastSeen) : 'هنوز باز نکرده');
-          row.innerHTML = `
-            <div class="radar-name-wrap">
-              <span class="status-dot${isOnline ? ' online' : ''}"></span>
-              <span class="radar-name">${name}</span>
-            </div>
-            <span class="radar-status${isOnline ? ' online-text' : ''}">${statusText}</span>`;
-          container.appendChild(row);
-        });
-      } catch (e) {
-        console.error("خطا در دریافت حضور", e);
-      }
-    }
-
-    sendPresence();
-    loadPresence();
-    setInterval(sendPresence, 10000); // هر ۱۰ ثانیه اعلام حضور
-    setInterval(loadPresence, 8000);  // هر ۸ ثانیه بروزرسانی رادار
-
-    // ---------- موقعیت مکانی ----------
-    function shareMyLocation() {
-      playClickSound();
-      const myName = localStorage.getItem(ME_KEY);
-      if (!myName) { alert('اول باید مشخص بشه شما کدوم عضو هستید.'); return; }
-
-      const label = document.getElementById('location-label-input').value.trim() || 'بدون توضیح';
-
-      if (!navigator.geolocation) {
-        alert('گوشیت از موقعیت مکانی پشتیبانی نمی‌کنه.');
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const data = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          label: label,
-          time: Date.now()
-        };
-        try {
-          await fetch(FIREBASE_URL + "/locations/" + encodeURIComponent(myName) + ".json", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-          });
-          document.getElementById('location-label-input').value = '';
-          loadLocations();
-        } catch (e) {
-          alert('ارسال موقعیت ناموفق بود.');
-        }
-      }, (err) => {
-        alert('دسترسی به موقعیت مکانی داده نشد یا با خطا مواجه شد.');
-      });
-    }
-
-    async function removeMyLocation() {
-      playClickSound();
-      const myName = localStorage.getItem(ME_KEY);
-      if (!myName) return;
-      try {
-        await fetch(FIREBASE_URL + "/locations/" + encodeURIComponent(myName) + ".json", {
-          method: "DELETE"
-        });
-        loadLocations();
-      } catch (e) {
-        console.error('خطا در حذف موقعیت', e);
-      }
-    }
-
-    async function loadLocations() {
-      const container = document.getElementById('location-list');
-      try {
-        const res = await fetch(FIREBASE_URL + "/locations.json");
-        const data = await res.json();
-        if (!data) { container.innerHTML = '<p style="font-size:0.82rem;color:#9ca3af;text-align:center;">هنوز کسی موقعیتش رو به اشتراک نذاشته</p>'; return; }
-
-        container.innerHTML = '';
-        Object.keys(data).forEach(name => {
-          const loc = data[name];
-          const mapUrl = `https://www.google.com/maps?q=${loc.lat},${loc.lng}`;
-          const item = document.createElement('div');
-          item.className = 'location-item';
-          item.innerHTML = `
-            <div class="location-item-info">
-              <div class="location-item-name">${name}</div>
-              <div class="location-item-label">📍 ${loc.label}</div>
-              <div class="location-item-time">${relativeTimeFa(Date.now() - loc.time)}</div>
-            </div>
-            <a class="location-map-link" href="${mapUrl}" target="_blank">نقشه</a>`;
-          container.appendChild(item);
-        });
-      } catch (e) {
-        console.error('خطا در دریافت موقعیت‌ها', e);
-      }
-    }
-    loadLocations();
-    setInterval(loadLocations, 15000);
-
-    // ---------- جمله‌ی روزانه ----------
-    const dailyQuotes = [
-      "خانواده یعنی جایی که همیشه یه صندلی خالی برات هست.",
-      "بهترین لحظه‌ها اونایی هستن که با خانواده می‌گذرونی.",
-      "خنده‌های خانوادگی بهترین دواست.",
-      "هیچ‌وقت فراموش نکن، خونه همیشه همینجاست.",
-      "با هم بودن، قشنگ‌ترین اتفاق هر روزه.",
-      "عشق خانوادگی هیچ‌وقت تموم نمیشه.",
-      "هر دورهمی کوچیک، یه خاطره‌ی بزرگه.",
-      "کنار هم بودن، بهترین جشنه."
-    ];
-    function showDailyQuote() {
-      const today = new Date();
-      const dayIndex = today.getFullYear() * 400 + today.getMonth() * 31 + today.getDate();
-      const quote = dailyQuotes[dayIndex % dailyQuotes.length];
-      document.getElementById('quote-text').textContent = quote;
-    }
-    showDailyQuote();
-
-    // ---------- مدیریت صفحه شروع ----------
-    async function startApp() {
-      playClickSound();
-      const btn = document.querySelector('.start-btn.primary');
-      const originalText = btn.textContent;
-      btn.textContent = '⏳ در حال بررسی اتصال...';
-      btn.disabled = true;
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 4000);
-
-      try {
-        await fetch(FIREBASE_URL + '/.json', { signal: controller.signal, mode: 'cors' });
-        clearTimeout(timeout);
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('main-card').style.display = 'block';
-      } catch (e) {
-        clearTimeout(timeout);
-        openModal('vpn-error-modal');
-      } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
-      }
-    }
-
-    function openModal(id) {
-      playClickSound();
-      document.getElementById(id).classList.add('show');
-      if (id === 'profile-modal') loadProfileInfo();
-    }
-    function closeModal(id) {
-      playClickSound();
-      document.getElementById(id).classList.remove('show');
-    }
-
-    function endApp() {
-      playClickSound();
-      document.getElementById('start-screen').classList.add('hidden');
-      document.getElementById('end-screen').classList.add('show');
-
-      setTimeout(() => {
-        // تلاش برای بستن اپ با روش‌های مختلف بسته به نوع پلتفرم
-
-        // ۱. اپ‌های ساخته‌شده با Cordova (اکثر ابزارهای Website-to-APK مثل AppsGeyser)
-        try {
-          if (window.navigator && window.navigator.app && window.navigator.app.exitApp) {
-            window.navigator.app.exitApp();
-            return;
-          }
-        } catch (e) {}
-
-        // ۲. اینترفیس اختصاصی اندروید (بعضی اپ‌سازها این رو تزریق می‌کنن)
-        try {
-          if (window.Android && typeof window.Android.exitApp === 'function') {
-            window.Android.exitApp();
-            return;
-          }
-          if (window.Android && typeof window.Android.closeApp === 'function') {
-            window.Android.closeApp();
-            return;
-          }
-        } catch (e) {}
-
-        // ۳. پیام به اپلیکیشن‌های React Native / WebView سفارشی
-        try {
-          if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({ action: 'CLOSE_APP' }));
-            return;
-          }
-        } catch (e) {}
-
-        // ۴. تلاش عمومی مرورگر/PWA (فقط وقتی تب توسط اسکریپت باز شده باشه جواب میده)
-        try { window.close(); } catch (e) {}
-
-      }, 700);
-    }
-
-    // ---------- اطلاعات پروفایل / دستگاه ----------
-    function detectOS(ua) {
-      if (/iphone|ipad|ipod/i.test(ua)) return "iOS";
-      if (/android/i.test(ua)) return "Android";
-      if (/windows/i.test(ua)) return "Windows";
-      if (/mac os/i.test(ua)) return "macOS";
-      if (/linux/i.test(ua)) return "Linux";
-      return "نامشخص";
-    }
-    function detectBrowser(ua) {
-      if (/edg/i.test(ua)) return "Edge";
-      if (/chrome/i.test(ua) && !/edg/i.test(ua)) return "Chrome";
-      if (/safari/i.test(ua) && !/chrome/i.test(ua)) return "Safari";
-      if (/firefox/i.test(ua)) return "Firefox";
-      return "نامشخص";
-    }
-
-    async function loadProfileInfo() {
-      const myName = localStorage.getItem(ME_KEY) || "مهمان";
-      document.getElementById('profile-name').textContent = myName;
-      document.getElementById('profile-os').textContent = detectOS(navigator.userAgent);
-      document.getElementById('profile-browser').textContent = detectBrowser(navigator.userAgent);
-
-      try {
-        const res = await fetch('https://api.ipify.org?format=json');
-        const data = await res.json();
-        document.getElementById('profile-ip').textContent = data.ip;
-      } catch (e) {
-        document.getElementById('profile-ip').textContent = "در دسترس نیست";
-      }
-    }
-
-    // ---------- پیام لرزون ----------
-    const vibePatterns = {
-      heart: [100, 80, 100, 200, 250, 80, 100],
-      sos: [100, 60, 100, 60, 100, 200, 300, 60, 300, 60, 300, 200, 100, 60, 100, 60, 100],
-      laugh: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
-      knock: [150, 150, 150, 150, 150]
-    };
-    function sendVibe(type) {
-      playClickSound();
-      if (navigator.vibrate) {
-        navigator.vibrate(vibePatterns[type] || [200]);
-      } else {
-        alert('گوشیت از لرزش پشتیبانی نمی‌کنه.');
-      }
-    }
-
-    // ---------- حالت بیدار (Wake Lock) ----------
-    let wakeLock = null;
-    async function toggleWakeLock() {
-      playClickSound();
-      const btn = document.getElementById('wake-btn');
-      if (!('wakeLock' in navigator)) {
-        alert('مرورگرت از این قابلیت پشتیبانی نمی‌کنه.');
-        return;
-      }
-      try {
-        if (!wakeLock) {
-          wakeLock = await navigator.wakeLock.request('screen');
-          btn.textContent = 'فعاله ✅ (لمس کن خاموشش کنی)';
-          btn.classList.add('active');
-          wakeLock.addEventListener('release', () => {
-            btn.textContent = 'فعال کردن';
-            btn.classList.remove('active');
-            wakeLock = null;
-          });
-        } else {
-          await wakeLock.release();
-          wakeLock = null;
-          btn.textContent = 'فعال کردن';
-          btn.classList.remove('active');
-        }
-      } catch (e) {
-        console.error('خطا در حالت بیدار', e);
-      }
-    }
-
-    // ---------- پیام صوتی کوتاه ----------
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
-
-    async function toggleRecording() {
-      playClickSound();
-      if (isRecording) return;
-
-      const btn = document.getElementById('voice-record-btn');
-      const statusEl = document.getElementById('voice-status');
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
-        isRecording = true;
-        btn.classList.add('recording');
-        statusEl.textContent = 'در حال ضبط... 🔴';
-
-        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-        mediaRecorder.onstop = async () => {
-          isRecording = false;
-          btn.classList.remove('recording');
-          statusEl.textContent = 'در حال ارسال...';
-          stream.getTracks().forEach(track => track.stop());
-
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          const reader = new FileReader();
-          reader.onloadend = async () => {
-            const base64Audio = reader.result;
-            const myName = localStorage.getItem(ME_KEY) || 'مهمان';
-            const id = 'v' + Date.now();
-            try {
-              await fetch(FIREBASE_URL + '/voiceMessages/' + id + '.json', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: myName, audio: base64Audio, time: Date.now() })
-              });
-              statusEl.textContent = 'برای ضبط ۵ ثانیه‌ای لمس کن';
-              loadVoiceMessages();
-            } catch (e) {
-              statusEl.textContent = 'ارسال ناموفق بود';
+        const timeStr =
+          date.toLocaleString(
+            "fa-IR",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+              month: "short",
+              day: "numeric"
             }
-          };
-          reader.readAsDataURL(audioBlob);
+          );
+
+        a.innerHTML =
+          item.title +
+          '<span class="news-time">🕒 ' +
+          timeStr +
+          "</span>";
+
+        listEl.appendChild(a);
+
+      });
+
+  } catch (e) {
+
+    listEl.innerHTML =
+      '<div class="news-loading">' +
+      "دریافت اخبار ناموفق بود" +
+      "</div>";
+
+  }
+
+}
+
+document
+  .querySelectorAll(".news-tab")
+  .forEach(function (tab) {
+
+    tab.addEventListener(
+      "click",
+      function () {
+
+        document
+          .querySelectorAll(".news-tab")
+          .forEach(function (t) {
+
+            t.classList.remove(
+              "active"
+            );
+
+          });
+
+        tab.classList.add("active");
+
+        loadNews(
+          tab.dataset.feed
+        );
+
+      }
+    );
+
+  });
+
+loadNews("all");
+
+setInterval(function () {
+
+  const active =
+    document.querySelector(
+      ".news-tab.active"
+    );
+
+  if (active) {
+    loadNews(
+      active.dataset.feed
+    );
+  }
+
+}, 120000);
+
+
+/* =====================================================
+   تم
+   ===================================================== */
+
+function toggleTheme() {
+
+  const isDark =
+    document.body.classList.toggle(
+      "dark-mode"
+    );
+
+  document.getElementById(
+    "theme-toggle"
+  ).textContent =
+    isDark ? "☀️" : "🌙";
+
+  localStorage.setItem(
+    "khanevadeh_theme",
+    isDark ? "dark" : "light"
+  );
+
+  playClickSound();
+
+}
+
+if (
+  localStorage.getItem(
+    "khanevadeh_theme"
+  ) === "dark"
+) {
+
+  document.body.classList.add(
+    "dark-mode"
+  );
+
+  document.getElementById(
+    "theme-toggle"
+  ).textContent = "☀️";
+
+}
+
+
+/* =====================================================
+   صدای کلیک
+   ===================================================== */
+
+let audioCtx = null;
+
+function playClickSound() {
+
+  try {
+
+    if (!audioCtx) {
+
+      audioCtx =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+
+    }
+
+    const osc =
+      audioCtx.createOscillator();
+
+    const gain =
+      audioCtx.createGain();
+
+    osc.type = "sine";
+
+    osc.frequency.setValueAtTime(
+      720,
+      audioCtx.currentTime
+    );
+
+    osc.frequency.exponentialRampToValueAtTime(
+      340,
+      audioCtx.currentTime + 0.1
+    );
+
+    gain.gain.setValueAtTime(
+      0.15,
+      audioCtx.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      audioCtx.currentTime + 0.12
+    );
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(
+      audioCtx.currentTime + 0.12
+    );
+
+  } catch (e) {}
+
+}
+
+
+/* =====================================================
+   نام کاربر
+   ===================================================== */
+
+const ME_KEY =
+  "khanevadeh_my_name";
+
+function askMyName() {
+
+  let name =
+    localStorage.getItem(
+      ME_KEY
+    );
+
+  if (!name) {
+
+    const list =
+      familyMembers
+        .map(
+          (n, i) =>
+            (i + 1) +
+            ". " +
+            n
+        )
+        .join("\n");
+
+    const answer =
+      prompt(
+        "اسمت چیه؟ عدد مربوطه رو بنویس:\n" +
+        list
+      );
+
+    const idx =
+      parseInt(answer) - 1;
+
+    name =
+      familyMembers[idx] ||
+      null;
+
+    if (name) {
+
+      localStorage.setItem(
+        ME_KEY,
+        name
+      );
+
+    }
+
+  }
+
+  return name;
+
+}
+
+
+/* =====================================================
+   نشان‌ها
+   ===================================================== */
+
+const memberBadges = {
+
+  "امیر عباس": {
+    icon: "👑",
+    title: "مالک",
+    owner: true
+  },
+
+  "ساشا": {
+    icon: "🦁",
+    title: "عضو خانواده"
+  },
+
+  "ساناز": {
+    icon: "🌸",
+    title: "عضو خانواده"
+  },
+
+  "پاشا": {
+    icon: "⚡",
+    title: "عضو خانواده"
+  },
+
+  "طاها": {
+    icon: "🎯",
+    title: "عضو خانواده"
+  },
+
+  "الناز": {
+    icon: "🌟",
+    title: "عضو خانواده"
+  }
+
+};
+
+function renderBadges() {
+
+  const container =
+    document.getElementById(
+      "badge-list"
+    );
+
+  container.innerHTML = "";
+
+  familyMembers.forEach(
+    function (name) {
+
+      const badge =
+        memberBadges[name];
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "badge-row" +
+        (badge.owner
+          ? " owner"
+          : "");
+
+      row.innerHTML = `
+        <div class="badge-icon-wrap">
+          <span class="badge-icon">
+            ${badge.icon}
+          </span>
+          ${
+            badge.owner
+              ? '<span class="badge-icon diamond">💎</span>'
+              : ""
+          }
+        </div>
+
+        <div class="badge-info">
+          <div class="badge-name">
+            ${name}
+          </div>
+
+          <div class="badge-title">
+            ${badge.title}
+          </div>
+        </div>
+      `;
+
+      container.appendChild(row);
+
+    }
+  );
+
+}
+
+renderBadges();
+
+
+/* =====================================================
+   بازدید
+   ===================================================== */
+
+async function trackVisit() {
+
+  const myName =
+    askMyName();
+
+  if (!myName) {
+
+    renderVisits({});
+
+    return;
+
+  }
+
+  try {
+
+    const res =
+      await fetch(
+        FIREBASE_URL +
+        "/visits.json"
+      );
+
+    const data =
+      await res.json() || {};
+
+    data[myName] =
+      (data[myName] || 0) + 1;
+
+    await fetch(
+      FIREBASE_URL +
+      "/visits.json",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body:
+          JSON.stringify(data)
+      }
+    );
+
+    renderVisits(data);
+
+  } catch (e) {
+
+    console.error(
+      "خطا در ثبت بازدید",
+      e
+    );
+
+  }
+
+}
+
+function renderVisits(data) {
+
+  const myName =
+    localStorage.getItem(
+      ME_KEY
+    );
+
+  const sorted =
+    familyMembers
+      .map(function (name) {
+
+        return {
+          name: name,
+          count: data[name] || 0
         };
 
-        mediaRecorder.start();
-        setTimeout(() => {
-          if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
-        }, 5000);
+      })
+      .sort(function (a,b) {
+
+        return b.count - a.count;
+
+      });
+
+  const container =
+    document.getElementById(
+      "visits-list"
+    );
+
+  container.innerHTML = "";
+
+  sorted.forEach(
+    function (person) {
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "visit-row" +
+        (
+          person.name === myName
+            ? " me"
+            : ""
+        );
+
+      row.innerHTML =
+        "<span>" +
+        person.name +
+        "</span>" +
+        '<span class="visit-count-num">' +
+        person.count +
+        " بار</span>";
+
+      container.appendChild(row);
+
+    }
+  );
+
+}
+
+trackVisit();
+
+
+/* =====================================================
+   رادار خانواده
+   ===================================================== */
+
+function relativeTimeFa(diffMs) {
+
+  const sec =
+    Math.floor(
+      diffMs / 1000
+    );
+
+  if (sec < 60)
+    return "چند ثانیه پیش";
+
+  const min =
+    Math.floor(sec / 60);
+
+  if (min < 60)
+    return min + " دقیقه پیش";
+
+  const hr =
+    Math.floor(min / 60);
+
+  if (hr < 24)
+    return hr + " ساعت پیش";
+
+  return (
+    Math.floor(hr / 24) +
+    " روز پیش"
+  );
+
+}
+
+async function sendPresence() {
+
+  const myName =
+    localStorage.getItem(
+      ME_KEY
+    );
+
+  if (!myName) return;
+
+  try {
+
+    await fetch(
+      FIREBASE_URL +
+      "/presence/" +
+      encodeURIComponent(myName) +
+      ".json",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body:
+          JSON.stringify(
+            Date.now()
+          )
+      }
+    );
+
+  } catch (e) {}
+
+}
+
+async function loadPresence() {
+
+  try {
+
+    const res =
+      await fetch(
+        FIREBASE_URL +
+        "/presence.json"
+      );
+
+    const data =
+      await res.json() || {};
+
+    const now =
+      Date.now();
+
+    const container =
+      document.getElementById(
+        "radar-list"
+      );
+
+    container.innerHTML = "";
+
+    familyMembers.forEach(
+      function (name) {
+
+        const lastSeen =
+          data[name];
+
+        const isOnline =
+          lastSeen &&
+          now - lastSeen < 20000;
+
+        const row =
+          document.createElement("div");
+
+        row.className =
+          "radar-row";
+
+        const status =
+          isOnline
+            ? "🟢 آنلاینه"
+            : (
+                lastSeen
+                  ? relativeTimeFa(
+                      now - lastSeen
+                    )
+                  : "هنوز باز نکرده"
+              );
+
+        row.innerHTML = `
+          <div class="radar-name-wrap">
+            <span class="status-dot ${
+              isOnline ? "online" : ""
+            }"></span>
+
+            <span class="radar-name">
+              ${name}
+            </span>
+          </div>
+
+          <span class="radar-status ${
+            isOnline
+              ? "online-text"
+              : ""
+          }">
+            ${status}
+          </span>
+        `;
+
+        container.appendChild(row);
+
+      }
+    );
+
+  } catch (e) {}
+
+}
+
+sendPresence();
+loadPresence();
+
+setInterval(
+  sendPresence,
+  10000
+);
+
+setInterval(
+  loadPresence,
+  8000
+);
+
+
+/* =====================================================
+   موقعیت
+   ===================================================== */
+
+function shareMyLocation() {
+
+  playClickSound();
+
+  const myName =
+    localStorage.getItem(
+      ME_KEY
+    );
+
+  if (!myName) {
+
+    alert(
+      "اول باید مشخص بشه شما کدوم عضو هستید."
+    );
+
+    return;
+
+  }
+
+  const label =
+    document.getElementById(
+      "location-label-input"
+    ).value.trim() ||
+    "بدون توضیح";
+
+  if (!navigator.geolocation) {
+
+    alert(
+      "گوشیت از موقعیت مکانی پشتیبانی نمی‌کنه."
+    );
+
+    return;
+
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    async function (pos) {
+
+      const data = {
+
+        lat:
+          pos.coords.latitude,
+
+        lng:
+          pos.coords.longitude,
+
+        label:
+          label,
+
+        time:
+          Date.now()
+
+      };
+
+      try {
+
+        await fetch(
+          FIREBASE_URL +
+          "/locations/" +
+          encodeURIComponent(
+            myName
+          ) +
+          ".json",
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body:
+              JSON.stringify(data)
+          }
+        );
+
+        document.getElementById(
+          "location-label-input"
+        ).value = "";
+
+        loadLocations();
+
       } catch (e) {
-        console.error('خطا در دسترسی به میکروفون', e);
-        statusEl.textContent = 'دسترسی به میکروفون رد شد';
+
+        alert(
+          "ارسال موقعیت ناموفق بود."
+        );
+
+      }
+
+    },
+
+    function () {
+
+      alert(
+        "دسترسی به موقعیت مکانی داده نشد یا با خطا مواجه شد."
+      );
+
+    }
+
+  );
+
+}
+
+async function removeMyLocation() {
+
+  playClickSound();
+
+  const myName =
+    localStorage.getItem(
+      ME_KEY
+    );
+
+  if (!myName) return;
+
+  try {
+
+    await fetch(
+      FIREBASE_URL +
+      "/locations/" +
+      encodeURIComponent(myName) +
+      ".json",
+      {
+        method: "DELETE"
+      }
+    );
+
+    loadLocations();
+
+  } catch (e) {}
+
+}
+
+async function loadLocations() {
+
+  const container =
+    document.getElementById(
+      "location-list"
+    );
+
+  try {
+
+    const res =
+      await fetch(
+        FIREBASE_URL +
+        "/locations.json"
+      );
+
+    const data =
+      await res.json();
+
+    if (!data) {
+
+      container.innerHTML =
+        '<p style="font-size:0.82rem;color:#9ca3af;text-align:center;">' +
+        "هنوز کسی موقعیتش رو به اشتراک نذاشته" +
+        "</p>";
+
+      return;
+
+    }
+
+    container.innerHTML = "";
+
+    Object.keys(data)
+      .forEach(function (name) {
+
+        const loc =
+          data[name];
+
+        const mapUrl =
+          "https://www.google.com/maps?q=" +
+          loc.lat +
+          "," +
+          loc.lng;
+
+        const item =
+          document.createElement("div");
+
+        item.className =
+          "location-item";
+
+        item.innerHTML = `
+          <div class="location-item-info">
+
+            <div class="location-item-name">
+              ${name}
+            </div>
+
+            <div class="location-item-label">
+              📍 ${loc.label}
+            </div>
+
+            <div class="location-item-time">
+              ${relativeTimeFa(
+                Date.now() - loc.time
+              )}
+            </div>
+
+          </div>
+
+          <a
+            class="location-map-link"
+            href="${mapUrl}"
+            target="_blank">
+            نقشه
+          </a>
+        `;
+
+        container.appendChild(item);
+
+      });
+
+  } catch (e) {}
+
+}
+
+loadLocations();
+
+setInterval(
+  loadLocations,
+  15000
+);
+
+
+/* =====================================================
+   جمله روز
+   ===================================================== */
+
+const dailyQuotes = [
+
+  "خانواده یعنی جایی که همیشه یه صندلی خالی برات هست.",
+
+  "بهترین لحظه‌ها اونایی هستن که با خانواده می‌گذرونی.",
+
+  "خنده‌های خانوادگی بهترین دواست.",
+
+  "هیچ‌وقت فراموش نکن، خونه همیشه همینجاست.",
+
+  "با هم بودن، قشنگ‌ترین اتفاق هر روزه.",
+
+  "عشق خانوادگی هیچ‌وقت تموم نمیشه.",
+
+  "هر دورهمی کوچیک، یه خاطره‌ی بزرگه.",
+
+  "کنار هم بودن، بهترین جشنه."
+
+];
+
+function showDailyQuote() {
+
+  const today =
+    new Date();
+
+  const index =
+    today.getFullYear() * 400 +
+    today.getMonth() * 31 +
+    today.getDate();
+
+  document.getElementById(
+    "quote-text"
+  ).textContent =
+    dailyQuotes[
+      index % dailyQuotes.length
+    ];
+
+}
+
+showDailyQuote();
+
+
+/* =====================================================
+   شروع اپ
+   ===================================================== */
+
+async function startApp() {
+
+  playClickSound();
+
+  const btn =
+    document.querySelector(
+      ".start-btn.primary"
+    );
+
+  const original =
+    btn.textContent;
+
+  btn.textContent =
+    "⏳ در حال بررسی اتصال...";
+
+  btn.disabled = true;
+
+  const controller =
+    new AbortController();
+
+  const timeout =
+    setTimeout(
+      function () {
+        controller.abort();
+      },
+      4000
+    );
+
+  try {
+
+    await fetch(
+      FIREBASE_URL +
+      "/.json",
+      {
+        signal:
+          controller.signal,
+        mode: "cors"
+      }
+    );
+
+    clearTimeout(timeout);
+
+    document.getElementById(
+      "start-screen"
+    ).classList.add("hidden");
+
+    document.getElementById(
+      "main-card"
+    ).style.display = "block";
+
+  } catch (e) {
+
+    clearTimeout(timeout);
+
+    openModal(
+      "vpn-error-modal"
+    );
+
+  } finally {
+
+    btn.textContent =
+      original;
+
+    btn.disabled = false;
+
+  }
+
+}
+
+
+/* =====================================================
+   مودال
+   ===================================================== */
+
+function openModal(id) {
+
+  playClickSound();
+
+  const modal =
+    document.getElementById(id);
+
+  if (!modal) return;
+
+  modal.classList.add("show");
+
+  if (
+    id === "profile-modal"
+  ) {
+
+    loadProfileInfo();
+
+  }
+
+}
+
+function closeModal(id) {
+
+  playClickSound();
+
+  const modal =
+    document.getElementById(id);
+
+  if (!modal) return;
+
+  modal.classList.remove("show");
+
+}
+
+
+/* =====================================================
+   پایان اپ
+   ===================================================== */
+
+function endApp() {
+
+  playClickSound();
+
+  document.getElementById(
+    "start-screen"
+  ).classList.add("hidden");
+
+  document.getElementById(
+    "end-screen"
+  ).classList.add("show");
+
+  setTimeout(function () {
+
+    try {
+
+      if (
+        window.navigator &&
+        window.navigator.app &&
+        window.navigator.app.exitApp
+      ) {
+
+        window.navigator.app.exitApp();
+
+        return;
+
+      }
+
+    } catch (e) {}
+
+    try {
+
+      if (
+        window.Android &&
+        typeof window.Android.exitApp ===
+        "function"
+      ) {
+
+        window.Android.exitApp();
+
+        return;
+
+      }
+
+      if (
+        window.Android &&
+        typeof window.Android.closeApp ===
+        "function"
+      ) {
+
+        window.Android.closeApp();
+
+        return;
+
+      }
+
+    } catch (e) {}
+
+    try {
+
+      if (
+        window.ReactNativeWebView &&
+        window.ReactNativeWebView.postMessage
+      ) {
+
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            action:
+              "CLOSE_APP"
+          })
+        );
+
+        return;
+
+      }
+
+    } catch (e) {}
+
+    try {
+      window.close();
+    } catch (e) {}
+
+  }, 700);
+
+}
+
+
+/* =====================================================
+   پروفایل
+   ===================================================== */
+
+function detectOS(ua) {
+
+  if (/iphone|ipad|ipod/i.test(ua))
+    return "iOS";
+
+  if (/android/i.test(ua))
+    return "Android";
+
+  if (/windows/i.test(ua))
+    return "Windows";
+
+  if (/mac os/i.test(ua))
+    return "macOS";
+
+  if (/linux/i.test(ua))
+    return "Linux";
+
+  return "نامشخص";
+
+}
+
+function detectBrowser(ua) {
+
+  if (/edg/i.test(ua))
+    return "Edge";
+
+  if (
+    /chrome/i.test(ua) &&
+    !/edg/i.test(ua)
+  )
+    return "Chrome";
+
+  if (
+    /safari/i.test(ua) &&
+    !/chrome/i.test(ua)
+  )
+    return "Safari";
+
+  if (/firefox/i.test(ua))
+    return "Firefox";
+
+  return "نامشخص";
+
+}
+
+async function loadProfileInfo() {
+
+  const myName =
+    localStorage.getItem(
+      ME_KEY
+    ) ||
+    "مهمان";
+
+  document.getElementById(
+    "profile-name"
+  ).textContent =
+    myName;
+
+  document.getElementById(
+    "profile-os"
+  ).textContent =
+    detectOS(
+      navigator.userAgent
+    );
+
+  document.getElementById(
+    "profile-browser"
+  ).textContent =
+    detectBrowser(
+      navigator.userAgent
+    );
+
+  try {
+
+    const res =
+      await fetch(
+        "https://api.ipify.org?format=json"
+      );
+
+    const data =
+      await res.json();
+
+    document.getElementById(
+      "profile-ip"
+    ).textContent =
+      data.ip;
+
+  } catch (e) {
+
+    document.getElementById(
+      "profile-ip"
+    ).textContent =
+      "در دسترس نیست";
+
+  }
+
+}
+
+
+/* =====================================================
+   لرزش
+   ===================================================== */
+
+const vibePatterns = {
+
+  heart:
+    [100,80,100,200,250,80,100],
+
+  sos:
+    [100,60,100,60,100,200,300,60,300,60,300,200,100,60,100,60,100],
+
+  laugh:
+    [50,50,50,50,50,50,50,50,50,50],
+
+  knock:
+    [150,150,150,150,150]
+
+};
+
+function sendVibe(type) {
+
+  playClickSound();
+
+  if (navigator.vibrate) {
+
+    navigator.vibrate(
+      vibePatterns[type] ||
+      [200]
+    );
+
+  } else {
+
+    alert(
+      "گوشیت از لرزش پشتیبانی نمی‌کنه."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   Wake Lock
+   ===================================================== */
+
+let wakeLock = null;
+
+async function toggleWakeLock() {
+
+  playClickSound();
+
+  const btn =
+    document.getElementById(
+      "wake-btn"
+    );
+
+  if (!("wakeLock" in navigator)) {
+
+    alert(
+      "مرورگرت از این قابلیت پشتیبانی نمی‌کنه."
+    );
+
+    return;
+
+  }
+
+  try {
+
+    if (!wakeLock) {
+
+      wakeLock =
+        await navigator.wakeLock.request(
+          "screen"
+        );
+
+      btn.textContent =
+        "فعاله ✅ (لمس کن خاموشش کنی)";
+
+      btn.classList.add("active");
+
+      wakeLock.addEventListener(
+        "release",
+        function () {
+
+          btn.textContent =
+            "فعال کردن";
+
+          btn.classList.remove(
+            "active"
+          );
+
+          wakeLock = null;
+
+        }
+      );
+
+    } else {
+
+      await wakeLock.release();
+
+      wakeLock = null;
+
+      btn.textContent =
+        "فعال کردن";
+
+      btn.classList.remove(
+        "active"
+      );
+
+    }
+
+  } catch (e) {
+
+    console.error(
+      "خطا در حالت بیدار",
+      e
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   پیام صوتی
+   ===================================================== */
+
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+
+async function toggleRecording() {
+
+  playClickSound();
+
+  if (isRecording) return;
+
+  const btn =
+    document.getElementById(
+      "voice-record-btn"
+    );
+
+  const statusEl =
+    document.getElementById(
+      "voice-status"
+    );
+
+  try {
+
+    if (
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ) {
+
+      statusEl.textContent =
+        "مرورگر از میکروفون پشتیبانی نمی‌کند";
+
+      return;
+
+    }
+
+    const stream =
+      await navigator.mediaDevices.getUserMedia(
+        {
+          audio: true
+        }
+      );
+
+    mediaRecorder =
+      new MediaRecorder(stream);
+
+    audioChunks = [];
+
+    isRecording = true;
+
+    btn.classList.add(
+      "recording"
+    );
+
+    statusEl.textContent =
+      "در حال ضبط... 🔴";
+
+    mediaRecorder.ondataavailable =
+      function (e) {
+
+        audioChunks.push(
+          e.data
+        );
+
+      };
+
+    mediaRecorder.onstop =
+      async function () {
+
         isRecording = false;
-        btn.classList.remove('recording');
+
+        btn.classList.remove(
+          "recording"
+        );
+
+        statusEl.textContent =
+          "در حال ارسال...";
+
+        stream
+          .getTracks()
+          .forEach(
+            track =>
+              track.stop()
+          );
+
+        const audioBlob =
+          new Blob(
+            audioChunks,
+            {
+              type:
+                "audio/webm"
+            }
+          );
+
+        const reader =
+          new FileReader();
+
+        reader.onloadend =
+          async function () {
+
+            const base64Audio =
+              reader.result;
+
+            const myName =
+              localStorage.getItem(
+                ME_KEY
+              ) ||
+              "مهمان";
+
+            const id =
+              "v" +
+              Date.now();
+
+            try {
+
+              await fetch(
+                FIREBASE_URL +
+                "/voiceMessages/" +
+                id +
+                ".json",
+                {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+                  body:
+                    JSON.stringify({
+                      name:
+                        myName,
+
+                      audio:
+                        base64Audio,
+
+                      time:
+                        Date.now()
+                    })
+                }
+              );
+
+              statusEl.textContent =
+                "برای ضبط ۵ ثانیه‌ای لمس کن";
+
+              loadVoiceMessages();
+
+            } catch (e) {
+
+              statusEl.textContent =
+                "ارسال ناموفق بود";
+
+            }
+
+          };
+
+        reader.readAsDataURL(
+          audioBlob
+        );
+
+      };
+
+    mediaRecorder.start();
+
+    setTimeout(function () {
+
+      if (
+        mediaRecorder &&
+        mediaRecorder.state ===
+        "recording"
+      ) {
+
+        mediaRecorder.stop();
+
       }
+
+    }, 5000);
+
+  } catch (e) {
+
+    console.error(
+      "خطا در میکروفون",
+      e
+    );
+
+    statusEl.textContent =
+      "دسترسی به میکروفون رد شد";
+
+    isRecording = false;
+
+    btn.classList.remove(
+      "recording"
+    );
+
+  }
+
+}
+
+async function loadVoiceMessages() {
+
+  const listEl =
+    document.getElementById(
+      "voice-list"
+    );
+
+  try {
+
+    const res =
+      await fetch(
+        FIREBASE_URL +
+        "/voiceMessages.json"
+      );
+
+    const data =
+      await res.json();
+
+    if (!data) {
+
+      listEl.innerHTML = "";
+
+      return;
+
     }
 
-    async function loadVoiceMessages() {
-      const listEl = document.getElementById('voice-list');
-      try {
-        const res = await fetch(FIREBASE_URL + '/voiceMessages.json');
-        const data = await res.json();
-        if (!data) { listEl.innerHTML = ''; return; }
+    const items =
+      Object.values(data)
+        .sort(
+          (a,b) =>
+            b.time - a.time
+        )
+        .slice(0,10);
 
-        const items = Object.values(data).sort((a, b) => b.time - a.time).slice(0, 10);
-        listEl.innerHTML = '';
-        items.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'voice-item';
-          div.innerHTML = `<span>${item.name}</span><audio controls src="${item.audio}"></audio>`;
-          listEl.appendChild(div);
-        });
-      } catch (e) {
-        console.error('خطا در دریافت پیام‌های صوتی', e);
+    listEl.innerHTML = "";
+
+    items.forEach(
+      function (item) {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "voice-item";
+
+        div.innerHTML =
+          "<span>" +
+          item.name +
+          "</span>" +
+          '<audio controls src="' +
+          item.audio +
+          '"></audio>';
+
+        listEl.appendChild(
+          div
+        );
+
       }
-    }
-    loadVoiceMessages();
+    );
 
-    // ---------- بررسی اتصال (وی‌پی‌ان) ----------
-    async function checkVpnConnection() {
-      playClickSound();
-      const resultEl = document.getElementById('vpn-check-result');
-      resultEl.className = 'checking';
-      resultEl.textContent = '⏳ در حال بررسی...';
+  } catch (e) {}
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 4000);
+}
 
-      try {
-        await fetch(FIREBASE_URL + '/.json', { signal: controller.signal, mode: 'cors' });
-        clearTimeout(timeout);
-        resultEl.className = 'ok';
-        resultEl.textContent = '✅ وی‌پی‌ان روشنه، می‌تونی وارد شی';
-      } catch (e) {
-        clearTimeout(timeout);
-        resultEl.className = 'fail';
-        resultEl.textContent = '❌ وی‌پی‌ان روشن نیست یا وصل نشده، لطفاً روشنش کن';
+loadVoiceMessages();
+
+
+/* =====================================================
+   بررسی اتصال
+   ===================================================== */
+
+async function checkVpnConnection() {
+
+  playClickSound();
+
+  const resultEl =
+    document.getElementById(
+      "vpn-check-result"
+    );
+
+  resultEl.className =
+    "checking";
+
+  resultEl.textContent =
+    "⏳ در حال بررسی...";
+
+  const controller =
+    new AbortController();
+
+  const timeout =
+    setTimeout(
+      function () {
+        controller.abort();
+      },
+      4000
+    );
+
+  try {
+
+    await fetch(
+      FIREBASE_URL +
+      "/.json",
+      {
+        signal:
+          controller.signal,
+        mode:
+          "cors"
       }
-    }
-  </script>
+    );
+
+    clearTimeout(timeout);
+
+    resultEl.className =
+      "ok";
+
+    resultEl.textContent =
+      "✅ وی‌پی‌ان روشنه، می‌تونی وارد شی";
+
+  } catch (e) {
+
+    clearTimeout(timeout);
+
+    resultEl.className =
+      "fail";
+
+    resultEl.textContent =
+      "❌ وی‌پی‌ان روشن نیست یا وصل نشده، لطفاً روشنش کن";
+
+  }
+
+}
+
+</script>
+
 </body>
-</html>
+ </html>
