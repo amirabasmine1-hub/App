@@ -1,256 +1,1170 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Family AI 🤖</title>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<title>Family AI 2.0 🤖</title>
 
-    body {
-      margin: 0;
-      font-family: Tahoma, Arial, sans-serif;
-      background: linear-gradient(135deg, #101828, #18243a);
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+<style>
 
-    .app {
-      width: 95%;
-      max-width: 600px;
-      height: 90vh;
-      background: rgba(20, 30, 48, 0.95);
-      border-radius: 25px;
-      overflow: hidden;
-      box-shadow: 0 15px 50px rgba(0,0,0,0.45);
-      display: flex;
-      flex-direction: column;
-    }
+*{
+box-sizing:border-box;
+}
 
-    .header {
-      padding: 20px;
-      text-align: center;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-    }
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+color:white;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:
+radial-gradient(circle at top right,#263b73,transparent 35%),
+radial-gradient(circle at bottom left,#40166d,transparent 35%),
+#070b14;
+transition:.4s;
+}
 
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+body.green{
+background:
+radial-gradient(circle at top right,#075e46,transparent 35%),
+radial-gradient(circle at bottom left,#064e3b,transparent 35%),
+#06120f;
+}
 
-    .header p {
-      margin: 7px 0 0;
-      opacity: 0.85;
-      font-size: 13px;
-    }
+body.purple{
+background:
+radial-gradient(circle at top right,#6d28d9,transparent 35%),
+radial-gradient(circle at bottom left,#4c1d95,transparent 35%),
+#0d0717;
+}
 
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 18px;
-    }
+body.dark{
+background:#050505;
+}
 
-    .message {
-      margin: 10px 0;
-      padding: 13px 16px;
-      border-radius: 18px;
-      max-width: 85%;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
+.app{
+width:95%;
+max-width:700px;
+height:94vh;
+background:rgba(15,23,42,.9);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.1);
+border-radius:28px;
+overflow:hidden;
+box-shadow:0 20px 80px rgba(0,0,0,.55);
+display:flex;
+flex-direction:column;
+position:relative;
+}
 
-    .user {
-      background: #2563eb;
-      margin-right: auto;
-      border-bottom-right-radius: 5px;
-    }
+.header{
+padding:16px;
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+position:relative;
+text-align:center;
+}
 
-    .ai {
-      background: #29364d;
-      margin-left: auto;
-      border-bottom-left-radius: 5px;
-    }
+.header h1{
+margin:0;
+font-size:23px;
+}
 
-    .welcome {
-      background: transparent;
-      text-align: center;
-      max-width: 100%;
-      opacity: 0.9;
-    }
+.header p{
+margin:6px 0 0;
+font-size:12px;
+opacity:.85;
+}
 
-    .input-area {
-      display: flex;
-      gap: 8px;
-      padding: 12px;
-      background: #111827;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
+.top-buttons{
+position:absolute;
+left:10px;
+top:10px;
+display:flex;
+gap:6px;
+}
 
-    #message {
-      flex: 1;
-      border: none;
-      outline: none;
-      border-radius: 18px;
-      padding: 13px 16px;
-      font-size: 15px;
-      background: #253249;
-      color: white;
-      direction: rtl;
-    }
+.top-buttons button{
+border:0;
+background:rgba(0,0,0,.22);
+color:white;
+border-radius:12px;
+padding:8px;
+cursor:pointer;
+}
 
-    #message::placeholder {
-      color: #9ca3af;
-    }
+#chat{
+flex:1;
+overflow-y:auto;
+padding:18px;
+scroll-behavior:smooth;
+}
 
-    #send {
-      border: none;
-      width: 50px;
-      border-radius: 18px;
-      background: #2563eb;
-      color: white;
-      font-size: 21px;
-      cursor: pointer;
-    }
+.message{
+max-width:86%;
+padding:13px 16px;
+margin:10px 0;
+border-radius:20px;
+line-height:1.8;
+white-space:pre-wrap;
+word-break:break-word;
+animation:messageIn .25s ease;
+}
 
-    #send:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+@keyframes messageIn{
+from{
+opacity:0;
+transform:translateY(10px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
 
-    .typing {
-      opacity: 0.7;
-      font-size: 13px;
-    }
-  </style>
+.user{
+background:linear-gradient(135deg,#2563eb,#3b82f6);
+margin-right:auto;
+border-bottom-right-radius:5px;
+}
+
+.ai{
+background:#29364d;
+margin-left:auto;
+border-bottom-left-radius:5px;
+}
+
+.welcome{
+background:transparent;
+max-width:100%;
+text-align:center;
+opacity:.9;
+}
+
+.typing{
+opacity:.7;
+}
+
+.typing span{
+display:inline-block;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%,100%{opacity:.2}
+50%{opacity:1}
+}
+
+.input-area{
+padding:10px;
+display:flex;
+gap:7px;
+background:#090e19;
+border-top:1px solid rgba(255,255,255,.08);
+}
+
+#message{
+flex:1;
+min-width:0;
+border:1px solid rgba(255,255,255,.08);
+outline:none;
+border-radius:18px;
+padding:13px;
+font-size:15px;
+font-family:inherit;
+background:#1c2940;
+color:white;
+}
+
+#message:focus{
+border-color:#3b82f6;
+}
+
+.action{
+width:48px;
+border:0;
+border-radius:17px;
+color:white;
+font-size:20px;
+cursor:pointer;
+background:#26344e;
+}
+
+#send{
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+}
+
+#voice.recording{
+background:#dc2626;
+animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+50%{
+transform:scale(1.08);
+}
+}
+
+.menu{
+display:none;
+position:absolute;
+z-index:20;
+top:65px;
+left:10px;
+width:220px;
+background:#111827;
+border:1px solid rgba(255,255,255,.1);
+border-radius:18px;
+padding:10px;
+box-shadow:0 15px 40px rgba(0,0,0,.5);
+}
+
+.menu.show{
+display:block;
+animation:menuIn .2s ease;
+}
+
+@keyframes menuIn{
+from{
+opacity:0;
+transform:translateY(-8px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.menu button,
+.menu input{
+width:100%;
+margin:4px 0;
+padding:10px;
+border:0;
+border-radius:12px;
+font-family:inherit;
+}
+
+.menu button{
+background:#1f2937;
+color:white;
+cursor:pointer;
+}
+
+.menu input{
+background:#253249;
+color:white;
+outline:none;
+}
+
+.chat-list{
+max-height:180px;
+overflow:auto;
+margin-top:8px;
+}
+
+.chat-item{
+padding:9px;
+margin:4px 0;
+border-radius:10px;
+background:#1f2937;
+cursor:pointer;
+font-size:13px;
+}
+
+.file-preview{
+font-size:12px;
+opacity:.7;
+padding:5px 10px;
+}
+
+@media(max-width:500px){
+
+.app{
+width:100%;
+height:100vh;
+border-radius:0;
+}
+
+.message{
+max-width:91%;
+}
+
+}
+
+</style>
+
 </head>
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <div class="header">
-      <h1>🤖 Family AI</h1>
-      <p>دستیار هوش مصنوعی گروه خانوادگی</p>
-    </div>
+<div class="header">
 
-    <div id="chat">
-      <div class="message welcome">
-        سلام 👋<br>
-        من هوش مصنوعی گروه خانوادگی هستم 🤖<br>
-        هرچی می‌خوای بپرس تا کمکت کنم!
-      </div>
-    </div>
+<div class="top-buttons">
 
-    <div class="input-area">
-      <input
-        id="message"
-        type="text"
-        maxlength="2000"
-        placeholder="پیامت رو بنویس..."
-        autocomplete="off"
-      >
+<button onclick="toggleMenu()">☰</button>
 
-      <button id="send" onclick="sendMessage()">➤</button>
-    </div>
+<button onclick="newChat()">＋</button>
 
-  </div>
+</div>
 
-  <script>
-    const WORKER_URL =
-      "https://family-ai.amirabasmine1.workers.dev/";
+<h1>🤖 Family AI</h1>
 
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("message");
-    const sendButton = document.getElementById("send");
+<p>دستیار هوش مصنوعی گروه خانوادگی</p>
 
-    function addMessage(text, type) {
-      const div = document.createElement("div");
+</div>
 
-      div.className = "message " + type;
-      div.textContent = text;
+<div id="menu" class="menu">
 
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+<button onclick="newChat()">
+💬 چت جدید
+</button>
 
-      return div;
-    }
+<button onclick="clearCurrentChat()">
+🗑️ پاک کردن این چت
+</button>
 
-    async function sendMessage() {
-      const message = input.value.trim();
+<button onclick="clearAllChats()">
+💥 پاک کردن همه چت‌ها
+</button>
 
-      if (!message) return;
+<button onclick="changeTheme()">
+🎨 تغییر تم
+</button>
 
-      addMessage(message, "user");
+<input
+id="search"
+placeholder="🔍 جستجو در تاریخچه..."
+oninput="searchChats()"
+>
 
-      input.value = "";
-      input.disabled = true;
-      sendButton.disabled = true;
+<div id="chatList" class="chat-list"></div>
 
-      const typing = addMessage("🤖 در حال فکر کردن...", "ai typing");
+</div>
 
-      try {
+<div id="chat"></div>
 
-        const response = await fetch(WORKER_URL, {
-          method: "POST",
+<div id="filePreview"
+class="file-preview">
+</div>
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+<div class="input-area">
 
-          body: JSON.stringify({
-            message: message
-          })
-        });
+<button
+class="action"
+onclick="document.getElementById('file').click()">
+📎
+</button>
 
-        const data = await response.json();
+<input
+type="file"
+id="file"
+hidden
+accept="image/*,.txt,.md,.json"
+onchange="handleFile(event)"
+>
 
-        typing.remove();
+<button
+class="action"
+id="voice"
+onclick="toggleVoice()">
+🎙️
+</button>
 
-        if (!response.ok) {
-          addMessage(
-            data.reply || "❌ خطایی در ارتباط با هوش مصنوعی رخ داد.",
-            "ai"
-          );
-          return;
-        }
+<input
+id="message"
+type="text"
+maxlength="2000"
+placeholder="پیامت رو بنویس..."
+autocomplete="off"
+>
 
-        addMessage(
-          data.reply || "❌ پاسخی دریافت نشد.",
-          "ai"
-        );
+<button
+class="action"
+id="send"
+onclick="sendMessage()">
+➤
+</button>
 
-      } catch (error) {
+</div>
 
-        typing.remove();
+</div>
 
-        addMessage(
-          "❌ اتصال به سرور برقرار نشد. اینترنت یا Worker را بررسی کنید.",
-          "ai"
-        );
+<script>
 
-      } finally {
+const WORKER_URL =
+"https://family-ai.amirabasmine1.workers.dev/";
 
-        input.disabled = false;
-        sendButton.disabled = false;
-        input.focus();
+const CHAT_KEY =
+"family_ai_chats_v2";
 
-      }
-    }
+const THEME_KEY =
+"family_ai_theme";
 
-    input.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        sendMessage();
-      }
-    });
-  </script>
+let chats =
+JSON.parse(
+localStorage.getItem(CHAT_KEY) || "[]"
+);
+
+let currentChat = null;
+
+let selectedFile = null;
+
+let recognition = null;
+
+let speaking = false;
+
+
+/* =========================
+   چت‌ها
+========================= */
+
+function saveChats(){
+
+localStorage.setItem(
+CHAT_KEY,
+JSON.stringify(chats)
+);
+
+}
+
+
+function createChat(){
+
+return {
+id:Date.now(),
+title:"گفتگوی جدید",
+messages:[]
+};
+
+}
+
+
+function newChat(){
+
+currentChat = createChat();
+
+chats.unshift(currentChat);
+
+saveChats();
+
+renderChat();
+
+renderChatList();
+
+toggleMenu(false);
+
+}
+
+
+function getCurrentChat(){
+
+if(!currentChat){
+
+if(chats.length){
+
+currentChat = chats[0];
+
+}else{
+
+currentChat = createChat();
+
+chats.unshift(currentChat);
+
+saveChats();
+
+}
+
+}
+
+return currentChat;
+
+}
+
+
+/* =========================
+   نمایش
+========================= */
+
+const chatEl =
+document.getElementById("chat");
+
+const input =
+document.getElementById("message");
+
+const sendButton =
+document.getElementById("send");
+
+
+function addMessage(
+text,
+type,
+save=true
+){
+
+const div =
+document.createElement("div");
+
+div.className =
+"message " + type;
+
+div.textContent = text;
+
+chatEl.appendChild(div);
+
+chatEl.scrollTop =
+chatEl.scrollHeight;
+
+if(save){
+
+const c = getCurrentChat();
+
+c.messages.push({
+role:type==="user"
+?"user"
+:"assistant",
+content:text
+});
+
+if(
+type==="user" &&
+c.title==="گفتگوی جدید"
+){
+
+c.title =
+text.slice(0,30);
+
+}
+
+saveChats();
+
+renderChatList();
+
+}
+
+return div;
+
+}
+
+
+function renderChat(){
+
+chatEl.innerHTML="";
+
+const c =
+getCurrentChat();
+
+if(!c.messages.length){
+
+addMessage(
+"سلام 👋\n\nمن هوش مصنوعی گروه خانوادگی هستم 🤖\nهرچی می‌خوای بپرس تا کمکت کنم!",
+"welcome",
+false
+);
+
+}else{
+
+c.messages.forEach(m=>{
+
+addMessage(
+m.content,
+m.role==="user"
+?"user"
+:"ai",
+false
+);
+
+});
+
+}
+
+chatEl.scrollTop =
+chatEl.scrollHeight;
+
+}
+
+
+/* =========================
+   لیست چت‌ها
+========================= */
+
+function renderChatList(){
+
+const list =
+document.getElementById("chatList");
+
+list.innerHTML="";
+
+chats.forEach(c=>{
+
+const div =
+document.createElement("div");
+
+div.className="chat-item";
+
+div.textContent =
+"💬 " + c.title;
+
+div.onclick=function(){
+
+currentChat=c;
+
+renderChat();
+
+toggleMenu(false);
+
+};
+
+list.appendChild(div);
+
+});
+
+}
+
+
+/* =========================
+   ارسال
+========================= */
+
+async function sendMessage(){
+
+const message =
+input.value.trim();
+
+if(!message) return;
+
+const c =
+getCurrentChat();
+
+addMessage(message,"user");
+
+input.value="";
+
+input.disabled=true;
+
+sendButton.disabled=true;
+
+const typing =
+document.createElement("div");
+
+typing.className =
+"message ai typing";
+
+typing.innerHTML =
+"🤖 در حال فکر کردن <span>● ● ●</span>";
+
+chatEl.appendChild(typing);
+
+chatEl.scrollTop =
+chatEl.scrollHeight;
+
+try{
+
+const history =
+c.messages.slice(-20);
+
+const response =
+await fetch(
+WORKER_URL,
+{
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:JSON.stringify({
+messages:history
+})
+
+});
+
+const data =
+await response.json();
+
+typing.remove();
+
+if(!response.ok){
+
+addMessage(
+data.reply ||
+"❌ خطایی رخ داد.",
+"ai"
+);
+
+return;
+
+}
+
+const answer =
+data.reply ||
+"❌ پاسخی دریافت نشد.";
+
+const aiMessage =
+addMessage(
+"",
+"ai",
+false
+);
+
+await typeText(
+aiMessage,
+answer
+);
+
+c.messages.push({
+role:"assistant",
+content:answer
+});
+
+saveChats();
+
+speak(answer);
+
+}catch(error){
+
+typing.remove();
+
+addMessage(
+"❌ اتصال به سرور برقرار نشد.",
+"ai"
+);
+
+}finally{
+
+input.disabled=false;
+
+sendButton.disabled=false;
+
+input.focus();
+
+}
+
+}
+
+
+/* =========================
+   تایپ تدریجی
+========================= */
+
+async function typeText(
+element,
+text
+){
+
+for(
+let i=0;
+i<text.length;
+i++
+){
+
+element.textContent =
+text.slice(0,i+1);
+
+chatEl.scrollTop =
+chatEl.scrollHeight;
+
+await new Promise(
+resolve =>
+setTimeout(resolve,8)
+);
+
+}
+
+}
+
+
+/* =========================
+   صدا
+========================= */
+
+function speak(text){
+
+if(!("speechSynthesis" in window))
+return;
+
+speechSynthesis.cancel();
+
+const utterance =
+new SpeechSynthesisUtterance(text);
+
+utterance.lang="fa-IR";
+
+utterance.rate=.95;
+
+speechSynthesis.speak(
+utterance
+);
+
+}
+
+
+function stopSpeak(){
+
+if("speechSynthesis" in window)
+speechSynthesis.cancel();
+
+}
+
+
+/* =========================
+   تبدیل صدا به متن
+========================= */
+
+function setupVoice(){
+
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+if(!SpeechRecognition)
+return false;
+
+recognition =
+new SpeechRecognition();
+
+recognition.lang="fa-IR";
+
+recognition.continuous=false;
+
+recognition.interimResults=false;
+
+recognition.onstart=function(){
+
+speaking=true;
+
+document
+.getElementById("voice")
+.classList.add("recording");
+
+};
+
+recognition.onresult=function(event){
+
+input.value =
+event.results[0][0].transcript;
+
+};
+
+recognition.onend=function(){
+
+speaking=false;
+
+document
+.getElementById("voice")
+.classList.remove("recording");
+
+};
+
+recognition.onerror=function(){
+
+speaking=false;
+
+document
+.getElementById("voice")
+.classList.remove("recording");
+
+};
+
+return true;
+
+}
+
+
+function toggleVoice(){
+
+if(!recognition){
+
+if(!setupVoice()){
+
+alert(
+"❌ مرورگر شما از تبدیل صدا به متن پشتیبانی نمی‌کند."
+);
+
+return;
+
+}
+
+}
+
+if(speaking){
+
+recognition.stop();
+
+}else{
+
+recognition.start();
+
+}
+
+}
+
+
+/* =========================
+   فایل
+========================= */
+
+async function handleFile(event){
+
+const file =
+event.target.files[0];
+
+if(!file) return;
+
+selectedFile=file;
+
+const preview =
+document.getElementById("filePreview");
+
+preview.textContent =
+"📎 " + file.name;
+
+if(
+file.type==="text/plain" ||
+file.name.endsWith(".md") ||
+file.name.endsWith(".json")
+){
+
+try{
+
+const text =
+await file.text();
+
+input.value =
+"این فایل را بررسی کن:\n\n" +
+text.slice(0,10000);
+
+preview.textContent =
+"📎 فایل آماده ارسال: " +
+file.name;
+
+}catch{
+
+preview.textContent =
+"❌ خواندن فایل ناموفق بود.";
+
+}
+
+}else if(
+file.type.startsWith("image/")
+){
+
+preview.textContent =
+"🖼️ عکس انتخاب شد: " +
+file.name +
+" — پشتیبانی مستقیم تصویر به مدل فعلی وابسته است.";
+
+}else{
+
+preview.textContent =
+"📎 فایل انتخاب شد: " +
+file.name;
+
+}
+
+}
+
+
+/* =========================
+   جستجو
+========================= */
+
+function searchChats(){
+
+const q =
+document
+.getElementById("search")
+.value
+.trim()
+.toLowerCase();
+
+const list =
+document.getElementById("chatList");
+
+list.innerHTML="";
+
+chats
+.filter(c=>{
+
+if(!q) return true;
+
+return (
+c.title.toLowerCase().includes(q) ||
+c.messages.some(m=>
+m.content.toLowerCase().includes(q)
+)
+);
+
+})
+.forEach(c=>{
+
+const div =
+document.createElement("div");
+
+div.className="chat-item";
+
+div.textContent =
+"💬 " + c.title;
+
+div.onclick=()=>{
+
+currentChat=c;
+
+renderChat();
+
+toggleMenu(false);
+
+};
+
+list.appendChild(div);
+
+});
+
+}
+
+
+/* =========================
+   پاک کردن
+========================= */
+
+function clearCurrentChat(){
+
+if(!currentChat) return;
+
+if(!confirm(
+"تاریخچه این گفتگو پاک شود؟"
+)) return;
+
+currentChat.messages=[];
+
+currentChat.title="گفتگوی جدید";
+
+saveChats();
+
+renderChat();
+
+renderChatList();
+
+}
+
+
+function clearAllChats(){
+
+if(!confirm(
+"⚠️ همه گفتگوها پاک شوند؟"
+)) return;
+
+localStorage.removeItem(CHAT_KEY);
+
+chats=[];
+
+currentChat=null;
+
+newChat();
+
+}
+
+
+/* =========================
+   تم
+========================= */
+
+const themes=[
+"",
+"purple",
+"green",
+"dark"
+];
+
+let themeIndex=0;
+
+function changeTheme(){
+
+themeIndex=
+(themeIndex+1) %
+themes.length;
+
+document.body.className =
+themes[themeIndex];
+
+localStorage.setItem(
+THEME_KEY,
+themes[themeIndex]
+);
+
+}
+
+
+const savedTheme =
+localStorage.getItem(THEME_KEY);
+
+if(savedTheme){
+
+document.body.className =
+savedTheme;
+
+themeIndex =
+themes.indexOf(savedTheme);
+
+if(themeIndex<0)
+themeIndex=0;
+
+}
+
+
+/* =========================
+   منو
+========================= */
+
+function toggleMenu(state){
+
+const menu =
+document.getElementById("menu");
+
+if(state===false){
+
+menu.classList.remove("show");
+
+return;
+
+}
+
+menu.classList.toggle("show");
+
+renderChatList();
+
+}
+
+
+/* =========================
+   شروع
+========================= */
+
+if(chats.length){
+
+currentChat=chats[0];
+
+}else{
+
+newChat();
+
+}
+
+renderChat();
+
+renderChatList();
+
+input.focus();
+
+</script>
 
 </body>
 </html>
