@@ -1469,6 +1469,13 @@ h2 {
 
   <div class="divider"></div>
 
+
+  <div id="today-date" style="margin:16px 0;padding:12px;border-radius:14px;background:rgba(118,75,162,0.1);font-size:0.9rem;line-height:1.9;">
+    📅 <b>امروز</b><br>
+    <span id="gregorian-date">در حال نمایش...</span><br>
+    <span id="jalali-date">در حال نمایش...</span>
+  </div>
+
   <div class="members">
 
     <h3>👥 اعضای گروه</h3>
@@ -1923,6 +1930,34 @@ function createParticles() {
 }
 
 createParticles();
+
+
+
+/* تاریخ امروز میلادی و خورشیدی */
+function showTodayDate() {
+  const now = new Date();
+
+  const gregorian = new Intl.DateTimeFormat("fa-IR", {
+    calendar: "gregory",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  }).format(now);
+
+  const jalali = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  }).format(now);
+
+  document.getElementById("gregorian-date").textContent =
+    "میلادی: " + gregorian;
+  document.getElementById("jalali-date").textContent =
+    "خورشیدی: " + jalali;
+}
+
+showTodayDate();
+
 
 
 /* =====================================================
